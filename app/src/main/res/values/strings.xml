@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Eventos Ibirama</string>
+
+    <!-- Auth -->
+    <string name="login">Entrar</string>
+    <string name="cadastro">Cadastrar</string>
+    <string name="email">E-mail</string>
+    <string name="senha">Senha</string>
+    <string name="confirmar_senha">Confirmar senha</string>
+    <string name="nome">Nome</string>
+    <string name="ja_tem_conta">Já tem conta? Entrar</string>
+    <string name="nao_tem_conta">Não tem conta? Cadastre-se</string>
+    <string name="esqueceu_senha">Esqueceu a senha?</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Início</string>
+    <string name="nav_favoritos">Favoritos</string>
+    <string name="nav_mapa">Mapa</string>
+    <string name="nav_perfil">Perfil</string>
+
+    <!-- Eventos -->
+    <string name="eventos">Eventos</string>
+    <string name="categorias">Categorias</string>
+    <string name="detalhes">Detalhes</string>
+    <string name="favoritar">Favoritar</string>
+    <string name="ver_no_mapa">Ver no Mapa</string>
+    <string name="buscar_eventos">Buscar eventos…</string>
+    <string name="nenhum_evento">Nenhum evento encontrado</string>
+    <string name="nenhum_favorito">Você ainda não tem favoritos</string>
+    <string name="data_hora">Data e Hora</string>
+    <string name="local">Local</string>
+    <string name="descricao">Descrição</string>
+
+    <!-- Perfil -->
+    <string name="perfil">Perfil</string>
+    <string name="sair">Sair</string>
+    <string name="usuario">Usuário</string>
+
+    <!-- Erros -->
+    <string name="erro_campos_vazios">Preencha todos os campos</string>
+    <string name="erro_senhas_diferentes">As senhas não coincidem</string>
+    <string name="erro_email_invalido">E-mail inválido</string>
+    <string name="erro_senha_curta">Senha deve ter ao menos 6 caracteres</string>
+</resources>

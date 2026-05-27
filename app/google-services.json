@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "222779769886",
+    "project_id": "eventosibirama-e3bdb",
+    "storage_bucket": "eventosibirama-e3bdb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:222779769886:android:2d700802d84996aa3fda0f",
+        "android_client_info": {
+          "package_name": "com.example.eventosibirama"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3c4agbo7oTgXYN-ub2_C4KzjWxj6TMDM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
