@@ -1,26 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Cores principais -->
     <color name="primary">#BB86FC</color>
     <color name="primary_dark">#9B67D6</color>
     <color name="primary_light">#3D2B6B</color>
     <color name="accent">#FF6F00</color>
-
-    <!-- Fundo e superfícies -->
     <color name="background">#121212</color>
     <color name="surface">#1E1E1E</color>
     <color name="card_background">#1E1E1E</color>
-
-    <!-- Textos -->
     <color name="on_primary">#FFFFFF</color>
     <color name="on_surface">#FFFFFF</color>
     <color name="text_secondary">#9E9E9E</color>
-
-    <!-- Outros -->
     <color name="divider">#2C2C2C</color>
     <color name="error">#CF6679</color>
     <color name="favorite_active">#E53935</color>
     <color name="favorite_inactive">#9E9E9E</color>
-    <color name="shimmer_base">#2C2C2C</color>
-    <color name="shimmer_highlight">#3C3C3C</color>
 </resources>

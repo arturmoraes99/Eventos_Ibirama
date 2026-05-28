@@ -9,21 +9,25 @@
         <item name="colorSurface">@color/surface</item>
         <item name="colorOnSurface">@color/on_surface</item>
         <item name="colorError">@color/error</item>
+        <item name="android:statusBarColor">@color/surface</item>
+        <item name="android:navigationBarColor">@color/surface</item>
     </style>
 
-    <!-- Bug #1 CORRIGIDO: tema NoActionBar adicionado -->
     <style name="Theme.EventosIbirama.NoActionBar" parent="Theme.EventosIbirama" />
 
     <style name="Theme.EventosIbirama.SplashTheme" parent="Theme.EventosIbirama">
-        <item name="android:windowBackground">@color/primary</item>
+        <item name="android:windowBackground">@color/background</item>
     </style>
 
+    <!-- Cards escuros -->
     <style name="CardStyle" parent="Widget.MaterialComponents.CardView">
         <item name="cardElevation">4dp</item>
         <item name="cardCornerRadius">12dp</item>
+        <item name="cardBackgroundColor">@color/card_background</item>
         <item name="contentPaddingBottom">0dp</item>
     </style>
 
+    <!-- Botão primário -->
     <style name="ButtonPrimary" parent="Widget.MaterialComponents.Button">
         <item name="backgroundTint">@color/primary</item>
         <item name="android:textColor">@color/on_primary</item>
@@ -32,9 +36,12 @@
         <item name="android:paddingBottom">12dp</item>
     </style>
 
+    <!-- Input escuro -->
     <style name="InputStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="boxStrokeColor">@color/primary</item>
         <item name="hintTextColor">@color/primary</item>
+        <item name="android:textColorHint">@color/text_secondary</item>
+        <item name="boxBackgroundColor">@color/surface</item>
     </style>
 
 </resources>

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,14 +14,17 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.eventosibirama.R;
 import com.example.eventosibirama.view.activity.AuthActivity;
+import com.example.eventosibirama.viewmodel.FavoritosViewModel;
 import com.example.eventosibirama.viewmodel.PerfilViewModel;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class PerfilFragment extends Fragment {
 
-    private TextView tvNome, tvEmail;
-    private Button btnLogout;
+    private TextView tvNome, tvEmail, tvQtdFavoritos;
+    private MaterialButton btnLogout;
     private PerfilViewModel perfilViewModel;
+    private FavoritosViewModel favoritosViewModel;
 
     @Nullable
     @Override
@@ -36,11 +38,13 @@ public class PerfilFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        perfilViewModel = new ViewModelProvider(this).get(PerfilViewModel.class);
+        perfilViewModel   = new ViewModelProvider(this).get(PerfilViewModel.class);
+        favoritosViewModel = new ViewModelProvider(this).get(FavoritosViewModel.class);
 
-        tvNome   = view.findViewById(R.id.tv_nome_usuario);
-        tvEmail  = view.findViewById(R.id.tv_email_usuario);
-        btnLogout = view.findViewById(R.id.btn_logout);
+        tvNome         = view.findViewById(R.id.tv_nome_usuario);
+        tvEmail        = view.findViewById(R.id.tv_email_usuario);
+        tvQtdFavoritos = view.findViewById(R.id.tv_qtd_favoritos);
+        btnLogout      = view.findViewById(R.id.btn_logout);
 
         observarViewModel();
 
@@ -48,14 +52,24 @@ public class PerfilFragment extends Fragment {
     }
 
     private void observarViewModel() {
+        // Carrega nome e email
         perfilViewModel.getUsuario().observe(getViewLifecycleOwner(), usuario -> {
             if (usuario != null) {
                 tvNome.setText(usuario.getNome());
                 tvEmail.setText(usuario.getEmail());
             }
         });
-
         perfilViewModel.carregarPerfil();
+
+        // Carrega contagem de favoritos
+        favoritosViewModel.getFavoritos().observe(getViewLifecycleOwner(), eventos -> {
+            if (eventos != null) {
+                tvQtdFavoritos.setText(String.valueOf(eventos.size()));
+            } else {
+                tvQtdFavoritos.setText("0");
+            }
+        });
+        favoritosViewModel.carregarFavoritos();
     }
 
     private void realizarLogout() {
