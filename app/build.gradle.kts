@@ -44,7 +44,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel:2.9.0")
     implementation("androidx.lifecycle:lifecycle-livedata:2.9.0")
 
-    // Navigation (Fragments + Bottom Navigation)
+    // Navigation
     implementation("androidx.navigation:navigation-fragment:2.9.0")
     implementation("androidx.navigation:navigation-ui:2.9.0")
 
@@ -58,10 +58,13 @@ dependencies {
     implementation("com.google.android.gms:play-services-maps:19.2.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
-    // Glide (imagens)
+    // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
-    // WorkManager (notificações locais)
+    // CircleImageView ← ADICIONADO (Bug #3)
+    implementation("de.hdodenhof:circleimageview:3.1.0")
+
+    // WorkManager
     implementation("androidx.work:work-runtime:2.10.1")
 
     // Testes

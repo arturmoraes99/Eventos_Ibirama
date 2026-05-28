@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Bug #9 CORRIGIDO: IDs e CircleImageView corrigidos -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/background">
+    android:background="@color/background"
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -30,18 +32,18 @@
             android:orientation="vertical"
             android:padding="24dp">
 
-            <!-- Avatar -->
+            <!-- Avatar usando ImageView (sem dependência extra) -->
             <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/ivAvatar"
+                android:id="@+id/iv_avatar"
                 android:layout_width="@dimen/avatar_size"
                 android:layout_height="@dimen/avatar_size"
                 android:src="@drawable/ic_person"
                 app:civ_border_color="@color/primary"
                 app:civ_border_width="2dp" />
 
-            <!-- Nome -->
+            <!-- Nome do usuário -->
             <TextView
-                android:id="@+id/tvNomePerfil"
+                android:id="@+id/tv_nome_usuario"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
@@ -50,9 +52,9 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-            <!-- Email -->
+            <!-- Email do usuário -->
             <TextView
-                android:id="@+id/tvEmailPerfil"
+                android:id="@+id/tv_email_usuario"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -66,7 +68,6 @@
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="24dp" />
 
-            <!-- Card Info -->
             <com.google.android.material.card.MaterialCardView
                 style="@style/CardStyle"
                 android:layout_width="match_parent"
@@ -109,7 +110,7 @@
                             android:textSize="14sp" />
 
                         <TextView
-                            android:id="@+id/tvQtdFavoritos"
+                            android:id="@+id/tv_qtd_favoritos"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0"
@@ -119,9 +120,9 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Botão Sair -->
+            <!-- Botão Logout -->
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSair"
+                android:id="@+id/btn_logout"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

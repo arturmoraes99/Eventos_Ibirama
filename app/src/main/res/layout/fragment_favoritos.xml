@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Bug #10 CORRIGIDO: tv_vazio adicionado para FavoritosFragment -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/background">
+    android:background="@color/background"
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -19,32 +21,22 @@
             app:titleTextColor="@color/on_primary" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Estado vazio -->
-    <LinearLayout
-        android:id="@+id/layoutVazio"
+    <!-- Estado vazio com id correto -->
+    <TextView
+        android:id="@+id/tv_vazio"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
         android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <ImageView
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:src="@drawable/ic_favorite_border"
-            android:tint="@color/divider" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/nenhum_favorito"
-            android:textColor="@color/text_secondary"
-            android:textSize="16sp" />
-    </LinearLayout>
+        android:text="@string/nenhum_favorito"
+        android:textColor="@color/text_secondary"
+        android:textSize="16sp"
+        android:visibility="gone"
+        android:drawableTop="@drawable/ic_favorite_border"
+        android:drawablePadding="12dp" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvFavoritos"
+        android:id="@+id/rv_favoritos"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingStart="8dp"

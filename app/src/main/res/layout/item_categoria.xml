@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Bug #7 CORRIGIDO: IDs alinhados com CategoriaAdapter -->
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/cardCategoria"
     style="@style/CardStyle"
-    android:layout_width="100dp"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginEnd="8dp"
+    android:layout_margin="6dp"
     android:clickable="true"
     android:focusable="true">
 
@@ -15,25 +15,26 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="16dp">
 
         <ImageView
-            android:id="@+id/ivCategoria"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_event"
+            android:id="@+id/iv_icone_categoria"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_categoria_placeholder"
             android:tint="@color/primary" />
 
         <TextView
-            android:id="@+id/tvNomeCategoria"
+            android:id="@+id/tv_nome_categoria"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="8dp"
             android:gravity="center"
             android:maxLines="2"
             android:text="Categoria"
             android:textColor="@color/on_surface"
-            android:textSize="12sp" />
+            android:textSize="13sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>

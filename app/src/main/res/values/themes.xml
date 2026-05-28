@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="Theme.EventosIbirama" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
@@ -10,18 +11,19 @@
         <item name="colorError">@color/error</item>
     </style>
 
+    <!-- Bug #1 CORRIGIDO: tema NoActionBar adicionado -->
+    <style name="Theme.EventosIbirama.NoActionBar" parent="Theme.EventosIbirama" />
+
     <style name="Theme.EventosIbirama.SplashTheme" parent="Theme.EventosIbirama">
         <item name="android:windowBackground">@color/primary</item>
     </style>
 
-    <!-- Cards -->
     <style name="CardStyle" parent="Widget.MaterialComponents.CardView">
         <item name="cardElevation">4dp</item>
         <item name="cardCornerRadius">12dp</item>
         <item name="contentPaddingBottom">0dp</item>
     </style>
 
-    <!-- Botões -->
     <style name="ButtonPrimary" parent="Widget.MaterialComponents.Button">
         <item name="backgroundTint">@color/primary</item>
         <item name="android:textColor">@color/on_primary</item>
@@ -30,9 +32,9 @@
         <item name="android:paddingBottom">12dp</item>
     </style>
 
-    <!-- TextInputLayout -->
     <style name="InputStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="boxStrokeColor">@color/primary</item>
         <item name="hintTextColor">@color/primary</item>
     </style>
+
 </resources>

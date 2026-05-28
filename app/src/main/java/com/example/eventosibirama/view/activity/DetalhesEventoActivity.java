@@ -3,26 +3,25 @@ package com.example.eventosibirama.view.activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.example.eventosibirama.R;
 import com.example.eventosibirama.model.Evento;
 import com.example.eventosibirama.viewmodel.DetalhesEventoViewModel;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.button.MaterialButton;
 
 public class DetalhesEventoActivity extends AppCompatActivity {
 
     private ImageView ivImagem;
     private TextView tvNome, tvData, tvHora, tvLocal, tvDescricao;
-    private Button btnVerMapa;
-    private FloatingActionButton fabFavorito;
+    private MaterialButton btnVerMapa, fabFavorito;
 
     private DetalhesEventoViewModel viewModel;
     private String eventoId;
@@ -34,7 +33,6 @@ public class DetalhesEventoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detalhe_evento);
 
         eventoId = getIntent().getStringExtra("evento_id");
-
         viewModel = new ViewModelProvider(this).get(DetalhesEventoViewModel.class);
 
         inicializarViews();
@@ -47,39 +45,38 @@ public class DetalhesEventoActivity extends AppCompatActivity {
     }
 
     private void inicializarViews() {
-        ivImagem     = findViewById(R.id.iv_imagem_evento);
-        tvNome       = findViewById(R.id.tv_nome_evento);
-        tvData       = findViewById(R.id.tv_data_evento);
-        tvHora       = findViewById(R.id.tv_hora_evento);
-        tvLocal      = findViewById(R.id.tv_local_evento);
-        tvDescricao  = findViewById(R.id.tv_descricao_evento);
-        btnVerMapa   = findViewById(R.id.btn_ver_mapa);
-        fabFavorito  = findViewById(R.id.fab_favorito);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        // Botão voltar
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+        // Botão voltar funcionando
+        toolbar.setNavigationOnClickListener(v -> finish());
+
+        ivImagem    = findViewById(R.id.iv_imagem_evento);
+        tvNome      = findViewById(R.id.tv_nome_evento);
+        tvData      = findViewById(R.id.tv_data_evento);
+        tvHora      = findViewById(R.id.tv_hora_evento);
+        tvLocal     = findViewById(R.id.tv_local_evento);
+        tvDescricao = findViewById(R.id.tv_descricao_evento);
+        btnVerMapa  = findViewById(R.id.btn_ver_mapa);
+        fabFavorito = findViewById(R.id.fab_favorito);
     }
 
     private void observarViewModel() {
         viewModel.getEvento().observe(this, evento -> {
-            if (evento != null) {
-                preencherDados(evento);
-            }
+            if (evento != null) preencherDados(evento);
         });
 
         viewModel.isFavorito().observe(this, favorito -> {
             isFavorito = favorito;
-            fabFavorito.setImageResource(
+            fabFavorito.setIconResource(
                     favorito ? R.drawable.ic_favorite : R.drawable.ic_favorite_border
             );
+            fabFavorito.setText(favorito ? "Favoritado" : "Favoritar");
         });
 
         viewModel.getMensagem().observe(this, mensagem -> {
-            if (mensagem != null) {
+            if (mensagem != null)
                 Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show();
-            }
         });
     }
 
@@ -93,9 +90,9 @@ public class DetalhesEventoActivity extends AppCompatActivity {
         Glide.with(this)
                 .load(evento.getImagemUrl())
                 .placeholder(R.drawable.ic_evento_placeholder)
+                .centerCrop()
                 .into(ivImagem);
 
-        // Botão Ver no Mapa
         btnVerMapa.setOnClickListener(v -> {
             String uri = "geo:" + evento.getLatitude() + "," + evento.getLongitude()
                     + "?q=" + Uri.encode(evento.getLocal());
@@ -104,11 +101,11 @@ public class DetalhesEventoActivity extends AppCompatActivity {
             if (intent.resolveActivity(getPackageManager()) != null) {
                 startActivity(intent);
             } else {
-                Toast.makeText(this, "Google Maps não encontrado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,
+                        "Google Maps não encontrado", Toast.LENGTH_SHORT).show();
             }
         });
 
-        // Botão Favoritar
         fabFavorito.setOnClickListener(v -> {
             if (isFavorito) {
                 viewModel.removerFavorito(eventoId);
@@ -116,11 +113,5 @@ public class DetalhesEventoActivity extends AppCompatActivity {
                 viewModel.adicionarFavorito(eventoId);
             }
         });
-    }
-
-    @Override
-    public boolean onSupportNavigateUp() {
-        finish();
-        return true;
     }
 }
