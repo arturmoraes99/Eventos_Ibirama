@@ -1,5 +1,6 @@
 package com.example.eventosibirama.repository;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.eventosibirama.model.Evento;
@@ -18,8 +19,8 @@ public class EventoRepository {
         db = FirebaseFirestore.getInstance();
     }
 
-    // Busca todos os eventos
-    public MutableLiveData<List<Evento>> getTodosEventos() {
+    /** Retorna LiveData — encapsulamento correto. */
+    public LiveData<List<Evento>> getTodosEventos() {
         MutableLiveData<List<Evento>> liveData = new MutableLiveData<>();
 
         db.collection(COLECAO)
@@ -38,8 +39,7 @@ public class EventoRepository {
         return liveData;
     }
 
-    // Busca eventos por categoria
-    public MutableLiveData<List<Evento>> getEventosPorCategoria(String categoriaId) {
+    public LiveData<List<Evento>> getEventosPorCategoria(String categoriaId) {
         MutableLiveData<List<Evento>> liveData = new MutableLiveData<>();
 
         db.collection(COLECAO)
@@ -59,8 +59,7 @@ public class EventoRepository {
         return liveData;
     }
 
-    // Busca evento por ID
-    public MutableLiveData<Evento> getEventoPorId(String eventoId) {
+    public LiveData<Evento> getEventoPorId(String eventoId) {
         MutableLiveData<Evento> liveData = new MutableLiveData<>();
 
         db.collection(COLECAO)
@@ -80,20 +79,23 @@ public class EventoRepository {
         return liveData;
     }
 
-    // Busca eventos por nome (busca local após carregar)
-    public MutableLiveData<List<Evento>> buscarPorNome(String nome) {
+    /**
+     * Busca por nome — filtragem local após carregar.
+     * Para produção, considere Algolia ou Typesense para busca server-side.
+     */
+    public LiveData<List<Evento>> buscarPorNome(String nome) {
         MutableLiveData<List<Evento>> liveData = new MutableLiveData<>();
 
         db.collection(COLECAO)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     List<Evento> eventos = new ArrayList<>();
+                    String queryLower = nome.toLowerCase();
                     for (QueryDocumentSnapshot doc : querySnapshot) {
                         Evento evento = doc.toObject(Evento.class);
                         evento.setId(doc.getId());
                         if (evento.getNome() != null &&
-                                evento.getNome().toLowerCase()
-                                        .contains(nome.toLowerCase())) {
+                                evento.getNome().toLowerCase().contains(queryLower)) {
                             eventos.add(evento);
                         }
                     }

@@ -1,8 +1,10 @@
 package com.example.eventosibirama.repository;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.eventosibirama.model.Usuario;
+import com.example.eventosibirama.util.Resource;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -14,37 +16,43 @@ public class AuthRepository {
 
     public AuthRepository() {
         auth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+        db   = FirebaseFirestore.getInstance();
     }
 
-    public void cadastrar(String nome, String email, String senha,
-                          MutableLiveData<Boolean> sucesso,
-                          MutableLiveData<String> erro) {
+    /** Cadastra usuário e retorna Resource com loading/success/error. */
+    public LiveData<Resource<Boolean>> cadastrar(String nome, String email, String senha) {
+        MutableLiveData<Resource<Boolean>> liveData = new MutableLiveData<>();
+        liveData.setValue(Resource.loading());
 
         auth.createUserWithEmailAndPassword(email, senha)
                 .addOnSuccessListener(result -> {
                     FirebaseUser firebaseUser = result.getUser();
-                    if (firebaseUser != null) {
-                        Usuario usuario = new Usuario(
-                                firebaseUser.getUid(), nome, email
-                        );
-                        db.collection("usuarios")
-                                .document(firebaseUser.getUid())
-                                .set(usuario)
-                                .addOnSuccessListener(unused -> sucesso.setValue(true))
-                                .addOnFailureListener(e -> erro.setValue(e.getMessage()));
+                    if (firebaseUser == null) {
+                        liveData.setValue(Resource.error("Erro ao obter usuário."));
+                        return;
                     }
+                    Usuario usuario = new Usuario(firebaseUser.getUid(), nome, email);
+                    db.collection("usuarios")
+                            .document(firebaseUser.getUid())
+                            .set(usuario)
+                            .addOnSuccessListener(unused -> liveData.setValue(Resource.success(true)))
+                            .addOnFailureListener(e -> liveData.setValue(Resource.error(e.getMessage())));
                 })
-                .addOnFailureListener(e -> erro.setValue(e.getMessage()));
+                .addOnFailureListener(e -> liveData.setValue(Resource.error(e.getMessage())));
+
+        return liveData;
     }
 
-    public void login(String email, String senha,
-                      MutableLiveData<Boolean> sucesso,
-                      MutableLiveData<String> erro) {
+    /** Faz login e retorna Resource com loading/success/error. */
+    public LiveData<Resource<Boolean>> login(String email, String senha) {
+        MutableLiveData<Resource<Boolean>> liveData = new MutableLiveData<>();
+        liveData.setValue(Resource.loading());
 
         auth.signInWithEmailAndPassword(email, senha)
-                .addOnSuccessListener(result -> sucesso.setValue(true))
-                .addOnFailureListener(e -> erro.setValue(e.getMessage()));
+                .addOnSuccessListener(result -> liveData.setValue(Resource.success(true)))
+                .addOnFailureListener(e  -> liveData.setValue(Resource.error(e.getMessage())));
+
+        return liveData;
     }
 
     public void logout() {
@@ -55,20 +63,28 @@ public class AuthRepository {
         return auth.getCurrentUser();
     }
 
-    public void buscarDadosUsuario(MutableLiveData<Usuario> usuarioLiveData,
-                                   MutableLiveData<String> erro) {
+    public LiveData<Resource<Usuario>> buscarDadosUsuario() {
+        MutableLiveData<Resource<Usuario>> liveData = new MutableLiveData<>();
+        liveData.setValue(Resource.loading());
+
         FirebaseUser firebaseUser = auth.getCurrentUser();
-        if (firebaseUser == null) return;
+        if (firebaseUser == null) {
+            liveData.setValue(Resource.error("Usuário não logado."));
+            return liveData;
+        }
 
         db.collection("usuarios")
                 .document(firebaseUser.getUid())
                 .get()
                 .addOnSuccessListener(document -> {
                     if (document.exists()) {
-                        Usuario usuario = document.toObject(Usuario.class);
-                        usuarioLiveData.setValue(usuario);
+                        liveData.setValue(Resource.success(document.toObject(Usuario.class)));
+                    } else {
+                        liveData.setValue(Resource.error("Usuário não encontrado."));
                     }
                 })
-                .addOnFailureListener(e -> erro.setValue(e.getMessage()));
+                .addOnFailureListener(e -> liveData.setValue(Resource.error(e.getMessage())));
+
+        return liveData;
     }
 }

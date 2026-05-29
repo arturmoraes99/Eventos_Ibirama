@@ -7,7 +7,8 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,17 +21,19 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.eventosibirama.R;
 import com.example.eventosibirama.adapter.CategoriaAdapter;
 import com.example.eventosibirama.adapter.EventoAdapter;
-import com.example.eventosibirama.model.Evento;
 import com.example.eventosibirama.view.activity.DetalhesEventoActivity;
 import com.example.eventosibirama.viewmodel.EventoViewModel;
+import com.google.android.material.textfield.TextInputEditText;
 
 public class HomeFragment extends Fragment {
 
-    private RecyclerView rvCategorias, rvEventos;
-    private EditText etBusca;
-    private CategoriaAdapter categoriaAdapter;
-    private EventoAdapter eventoAdapter;
-    private EventoViewModel eventoViewModel;
+    private RecyclerView      rvCategorias, rvEventos;
+    private TextInputEditText etBusca;
+    private ProgressBar       progressBar;
+
+    private CategoriaAdapter  categoriaAdapter;
+    private EventoAdapter     eventoAdapter;
+    private EventoViewModel   eventoViewModel;
 
     @Nullable
     @Override
@@ -46,60 +49,80 @@ public class HomeFragment extends Fragment {
 
         eventoViewModel = new ViewModelProvider(this).get(EventoViewModel.class);
 
-        etBusca     = view.findViewById(R.id.et_busca);
+        etBusca      = view.findViewById(R.id.et_busca);
         rvCategorias = view.findViewById(R.id.rv_categorias);
         rvEventos    = view.findViewById(R.id.rv_eventos);
+        progressBar  = view.findViewById(R.id.progress_bar);
 
         configurarRecyclerCategorias();
         configurarRecyclerEventos();
         observarViewModel();
         configurarBusca();
+
+        // Carga inicial
+        carregarDadosIniciais();
     }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden) {
+            resetar();
+        }
+    }
+
+    // ── Configuração dos RecyclerViews ────────────────────────────────────────
 
     private void configurarRecyclerCategorias() {
         categoriaAdapter = new CategoriaAdapter(categoria -> {
-            // Ao clicar na categoria, filtra os eventos
+            // Limpa a busca antes de filtrar por categoria
+            if (etBusca != null) etBusca.setText("");
             eventoViewModel.buscarEventosPorCategoria(categoria.getId());
         });
 
-        rvCategorias.setLayoutManager(
-                new GridLayoutManager(getContext(), 2));
+        rvCategorias.setLayoutManager(new GridLayoutManager(getContext(), 2));
         rvCategorias.setAdapter(categoriaAdapter);
     }
 
     private void configurarRecyclerEventos() {
         eventoAdapter = new EventoAdapter(evento -> {
-            // Ao clicar no evento, abre detalhes
             Intent intent = new Intent(getActivity(), DetalhesEventoActivity.class);
             intent.putExtra("evento_id", evento.getId());
             startActivity(intent);
         });
 
-        rvEventos.setLayoutManager(
-                new LinearLayoutManager(getContext()));
+        rvEventos.setLayoutManager(new LinearLayoutManager(getContext()));
         rvEventos.setAdapter(eventoAdapter);
     }
 
+    // ── Observers ─────────────────────────────────────────────────────────────
+
     private void observarViewModel() {
-        // Observa categorias
-        eventoViewModel.getCategorias().observe(getViewLifecycleOwner(), categorias -> {
-            categoriaAdapter.setCategorias(categorias);
+        eventoViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
+            if (isLoading != null) {
+                progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+            }
         });
 
-        // Observa eventos
-        eventoViewModel.getEventos().observe(getViewLifecycleOwner(), eventos -> {
-            eventoAdapter.setEventos(eventos);
+        eventoViewModel.getErro().observe(getViewLifecycleOwner(), erro -> {
+            if (erro != null) {
+                Toast.makeText(getContext(), erro, Toast.LENGTH_SHORT).show();
+            }
         });
 
-        // Carrega dados iniciais
-        eventoViewModel.carregarCategorias();
-        eventoViewModel.carregarTodosEventos();
+        eventoViewModel.getCategorias().observe(getViewLifecycleOwner(),
+                categorias -> categoriaAdapter.setCategorias(categorias));
+
+        eventoViewModel.getEventos().observe(getViewLifecycleOwner(),
+                eventos -> eventoAdapter.setEventos(eventos));
     }
+
+    // ── Busca por texto ───────────────────────────────────────────────────────
 
     private void configurarBusca() {
         etBusca.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void afterTextChanged(Editable s) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -110,9 +133,23 @@ public class HomeFragment extends Fragment {
                     eventoViewModel.buscarEventosPorNome(query);
                 }
             }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
         });
+    }
+
+    // ── Reset / carga inicial ─────────────────────────────────────────────────
+
+
+    private void resetar() {
+        // Limpa o campo de busca sem disparar o TextWatcher
+        if (etBusca != null) {
+            etBusca.removeTextChangedListener(null);
+            etBusca.setText("");
+        }
+        carregarDadosIniciais();
+    }
+
+    private void carregarDadosIniciais() {
+        eventoViewModel.carregarCategorias();
+        eventoViewModel.carregarTodosEventos();
     }
 }

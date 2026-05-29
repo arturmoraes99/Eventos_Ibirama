@@ -1,5 +1,6 @@
 package com.example.eventosibirama.repository;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.eventosibirama.model.Usuario;
@@ -17,7 +18,8 @@ public class UsuarioRepository {
         auth = FirebaseAuth.getInstance();
     }
 
-    public MutableLiveData<Usuario> getUsuarioLogado() {
+    /** Retorna LiveData — encapsulamento correto. */
+    public LiveData<Usuario> getUsuarioLogado() {
         MutableLiveData<Usuario> liveData = new MutableLiveData<>();
 
         String uid = auth.getCurrentUser() != null
@@ -34,8 +36,7 @@ public class UsuarioRepository {
                 .get()
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
-                        Usuario usuario = doc.toObject(Usuario.class);
-                        liveData.setValue(usuario);
+                        liveData.setValue(doc.toObject(Usuario.class));
                     } else {
                         liveData.setValue(null);
                     }

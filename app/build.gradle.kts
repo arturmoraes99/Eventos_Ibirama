@@ -1,19 +1,42 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
 }
 
+/*
+ * CORRIGIDO: A chave da API do Google Maps NÃO deve ficar hardcoded
+ * no AndroidManifest.xml (fica exposta no repositório Git).
+ *
+ * Como configurar:
+ * 1. Abra (ou crie) o arquivo local.properties na raiz do projeto.
+ * 2. Adicione a linha:  MAPS_API_KEY=SuaChaveAqui
+ * 3. Certifique-se de que local.properties está no .gitignore (já está por padrão).
+ *
+ * O AndroidManifest.xml usa ${MAPS_API_KEY} para referenciar essa variável.
+ */
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { localProperties.load(it) }
+}
+
 android {
-    namespace = "com.example.eventosibirama"
+    namespace  = "com.example.eventosibirama"
     compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.eventosibirama"
-        minSdk = 24
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        minSdk        = 24
+        targetSdk     = 35
+        versionCode   = 1
+        versionName   = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Injeta a chave como placeholder do Manifest (nunca versionada)
+        manifestPlaceholders["MAPS_API_KEY"] =
+            localProperties.getProperty("MAPS_API_KEY", "")
     }
 
     buildTypes {
@@ -29,6 +52,11 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    // Necessário para BuildConfig (desabilitado por padrão no AGP moderno)
+    buildFeatures {
+        buildConfig = true
     }
 }
 
@@ -61,7 +89,7 @@ dependencies {
     // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
-    // CircleImageView ← ADICIONADO (Bug #3)
+    // CircleImageView
     implementation("de.hdodenhof:circleimageview:3.1.0")
 
     // WorkManager

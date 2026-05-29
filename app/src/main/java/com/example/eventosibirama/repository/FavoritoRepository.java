@@ -1,5 +1,6 @@
 package com.example.eventosibirama.repository;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.eventosibirama.model.Evento;
@@ -16,7 +17,7 @@ public class FavoritoRepository {
 
     private final FirebaseFirestore db;
     private final FirebaseAuth auth;
-    private static final String COLECAO_USUARIOS = "usuarios";
+    private static final String COLECAO_USUARIOS  = "usuarios";
     private static final String COLECAO_FAVORITOS = "favoritos";
     private static final String COLECAO_EVENTOS   = "eventos";
 
@@ -31,8 +32,7 @@ public class FavoritoRepository {
                 : null;
     }
 
-    // Adiciona evento aos favoritos
-    public MutableLiveData<Boolean> adicionarFavorito(String eventoId) {
+    public LiveData<Boolean> adicionarFavorito(String eventoId) {
         MutableLiveData<Boolean> liveData = new MutableLiveData<>();
         String uid = getUid();
         if (uid == null) { liveData.setValue(false); return liveData; }
@@ -51,8 +51,7 @@ public class FavoritoRepository {
         return liveData;
     }
 
-    // Remove evento dos favoritos
-    public MutableLiveData<Boolean> removerFavorito(String eventoId) {
+    public LiveData<Boolean> removerFavorito(String eventoId) {
         MutableLiveData<Boolean> liveData = new MutableLiveData<>();
         String uid = getUid();
         if (uid == null) { liveData.setValue(false); return liveData; }
@@ -68,8 +67,7 @@ public class FavoritoRepository {
         return liveData;
     }
 
-    // Verifica se evento é favorito
-    public MutableLiveData<Boolean> isFavorito(String eventoId) {
+    public LiveData<Boolean> isFavorito(String eventoId) {
         MutableLiveData<Boolean> liveData = new MutableLiveData<>();
         String uid = getUid();
         if (uid == null) { liveData.setValue(false); return liveData; }
@@ -85,8 +83,7 @@ public class FavoritoRepository {
         return liveData;
     }
 
-    // Lista todos os eventos favoritados
-    public MutableLiveData<List<Evento>> getFavoritos() {
+    public LiveData<List<Evento>> getFavoritos() {
         MutableLiveData<List<Evento>> liveData = new MutableLiveData<>();
         String uid = getUid();
         if (uid == null) { liveData.setValue(new ArrayList<>()); return liveData; }
@@ -107,7 +104,6 @@ public class FavoritoRepository {
         return liveData;
     }
 
-    // Busca os dados completos dos eventos favoritos
     private void buscarEventosPorIds(List<String> ids,
                                      MutableLiveData<List<Evento>> liveData) {
         if (ids.isEmpty()) {

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Bug #9 CORRIGIDO: IDs e CircleImageView corrigidos -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -21,6 +20,16 @@
             app:titleTextColor="@color/on_primary" />
     </com.google.android.material.appbar.AppBarLayout>
 
+    <!-- ADICIONADO: ProgressBar de loading -->
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:indeterminateTint="@color/primary"
+        android:visibility="gone" />
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -32,7 +41,6 @@
             android:orientation="vertical"
             android:padding="24dp">
 
-            <!-- Avatar usando ImageView (sem dependência extra) -->
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/iv_avatar"
                 android:layout_width="@dimen/avatar_size"
@@ -41,18 +49,16 @@
                 app:civ_border_color="@color/primary"
                 app:civ_border_width="2dp" />
 
-            <!-- Nome do usuário -->
             <TextView
                 android:id="@+id/tv_nome_usuario"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="Nome do Usuário"
+                android:text="@string/usuario"
                 android:textColor="@color/on_surface"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-            <!-- Email do usuário -->
             <TextView
                 android:id="@+id/tv_email_usuario"
                 android:layout_width="wrap_content"
@@ -82,7 +88,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Minha Conta"
+                        android:text="@string/minha_conta"
                         android:textColor="@color/on_surface"
                         android:textSize="16sp"
                         android:textStyle="bold" />
@@ -105,7 +111,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
                             android:layout_weight="1"
-                            android:text="Eventos Favoritos"
+                            android:text="@string/eventos_favoritos_label"
                             android:textColor="@color/on_surface"
                             android:textSize="14sp" />
 
@@ -120,7 +126,6 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Botão Logout -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_logout"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"

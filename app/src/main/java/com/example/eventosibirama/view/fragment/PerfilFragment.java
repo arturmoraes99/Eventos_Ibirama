@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,13 +19,15 @@ import com.example.eventosibirama.view.activity.AuthActivity;
 import com.example.eventosibirama.viewmodel.FavoritosViewModel;
 import com.example.eventosibirama.viewmodel.PerfilViewModel;
 import com.google.android.material.button.MaterialButton;
-import com.google.firebase.auth.FirebaseAuth;
+
 
 public class PerfilFragment extends Fragment {
 
-    private TextView tvNome, tvEmail, tvQtdFavoritos;
+    private TextView       tvNome, tvEmail, tvQtdFavoritos;
     private MaterialButton btnLogout;
-    private PerfilViewModel perfilViewModel;
+    private ProgressBar    progressBar;
+
+    private PerfilViewModel    perfilViewModel;
     private FavoritosViewModel favoritosViewModel;
 
     @Nullable
@@ -38,42 +42,57 @@ public class PerfilFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        perfilViewModel   = new ViewModelProvider(this).get(PerfilViewModel.class);
+        perfilViewModel    = new ViewModelProvider(this).get(PerfilViewModel.class);
         favoritosViewModel = new ViewModelProvider(this).get(FavoritosViewModel.class);
 
         tvNome         = view.findViewById(R.id.tv_nome_usuario);
         tvEmail        = view.findViewById(R.id.tv_email_usuario);
         tvQtdFavoritos = view.findViewById(R.id.tv_qtd_favoritos);
         btnLogout      = view.findViewById(R.id.btn_logout);
+        progressBar    = view.findViewById(R.id.progress_bar);
 
         observarViewModel();
 
+        // CORRIGIDO: Fragment apenas chama o ViewModel; Firebase fica no Repository
         btnLogout.setOnClickListener(v -> realizarLogout());
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        perfilViewModel.carregarPerfil();
+        favoritosViewModel.carregarFavoritos();
+    }
+
     private void observarViewModel() {
-        // Carrega nome e email
+        // Loading
+        perfilViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
+            if (isLoading != null) {
+                progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+            }
+        });
+
+        // Erro
+        perfilViewModel.getErro().observe(getViewLifecycleOwner(), erro -> {
+            if (erro != null) Toast.makeText(getContext(), erro, Toast.LENGTH_SHORT).show();
+        });
+
+        // Dados do usuário
         perfilViewModel.getUsuario().observe(getViewLifecycleOwner(), usuario -> {
             if (usuario != null) {
                 tvNome.setText(usuario.getNome());
                 tvEmail.setText(usuario.getEmail());
             }
         });
-        perfilViewModel.carregarPerfil();
 
-        // Carrega contagem de favoritos
-        favoritosViewModel.getFavoritos().observe(getViewLifecycleOwner(), eventos -> {
-            if (eventos != null) {
-                tvQtdFavoritos.setText(String.valueOf(eventos.size()));
-            } else {
-                tvQtdFavoritos.setText("0");
-            }
-        });
-        favoritosViewModel.carregarFavoritos();
+        // Contagem de favoritos
+        favoritosViewModel.getFavoritos().observe(getViewLifecycleOwner(), eventos ->
+                tvQtdFavoritos.setText(eventos != null ? String.valueOf(eventos.size()) : "0"));
     }
 
+
     private void realizarLogout() {
-        FirebaseAuth.getInstance().signOut();
+        perfilViewModel.logout();
         Intent intent = new Intent(getActivity(), AuthActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);

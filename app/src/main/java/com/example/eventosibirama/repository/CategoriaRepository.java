@@ -1,5 +1,6 @@
 package com.example.eventosibirama.repository;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.eventosibirama.model.Categoria;
@@ -18,7 +19,11 @@ public class CategoriaRepository {
         db = FirebaseFirestore.getInstance();
     }
 
-    public MutableLiveData<List<Categoria>> getCategorias() {
+    /**
+     * Retorna LiveData (não MutableLiveData) para proteger o encapsulamento.
+     * O ViewModel não pode alterar os dados diretamente.
+     */
+    public LiveData<List<Categoria>> getCategorias() {
         MutableLiveData<List<Categoria>> liveData = new MutableLiveData<>();
 
         db.collection(COLECAO)

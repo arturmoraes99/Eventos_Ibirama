@@ -24,20 +24,39 @@
     <string name="categorias">Categorias</string>
     <string name="detalhes">Detalhes</string>
     <string name="favoritar">Favoritar</string>
+    <!-- ADICIONADO: string para estado "favoritado" usada em DetalhesEventoActivity -->
+    <string name="favoritado">Favoritado</string>
     <string name="ver_no_mapa">Ver no Mapa</string>
     <string name="buscar_eventos">Buscar eventos…</string>
     <string name="nenhum_evento">Nenhum evento encontrado</string>
     <string name="nenhum_favorito">Você ainda não tem favoritos</string>
     <string name="data_hora">Data e Hora</string>
+    <!-- ADICIONADO: "Horário" separado de "Data e Hora" para uso nos labels -->
+    <string name="horario">Horário</string>
     <string name="local">Local</string>
     <string name="descricao">Descrição</string>
+    <!-- ADICIONADO: título do mapa antes hardcoded no XML -->
+    <string name="mapa_titulo">Mapa de Eventos</string>
 
     <!-- Perfil -->
     <string name="perfil">Perfil</string>
     <string name="sair">Sair</string>
     <string name="usuario">Usuário</string>
+    <!-- ADICIONADO: strings antes hardcoded nos layouts do perfil -->
+    <string name="minha_conta">Minha Conta</string>
+    <string name="eventos_favoritos_label">Eventos Favoritos</string>
 
-    <!-- Erros -->
+    <!-- Feedback de ações -->
+    <string name="evento_adicionado_favoritos">Evento adicionado aos favoritos!</string>
+    <string name="evento_removido_favoritos">Evento removido dos favoritos.</string>
+    <string name="erro_favoritar">Erro ao favoritar evento.</string>
+    <string name="erro_remover_favorito">Erro ao remover favorito.</string>
+    <string name="erro_carregar_eventos">Erro ao carregar eventos.</string>
+    <string name="erro_carregar_favoritos">Erro ao carregar favoritos.</string>
+    <!-- ADICIONADO: mensagem de erro quando Google Maps não está instalado -->
+    <string name="maps_nao_encontrado">Google Maps não encontrado</string>
+
+    <!-- Erros de validação -->
     <string name="erro_campos_vazios">Preencha todos os campos</string>
     <string name="erro_senhas_diferentes">As senhas não coincidem</string>
     <string name="erro_email_invalido">E-mail inválido</string>

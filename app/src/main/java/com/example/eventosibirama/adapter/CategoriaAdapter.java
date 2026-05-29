@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -15,6 +16,7 @@ import com.example.eventosibirama.model.Categoria;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.CategoriaViewHolder> {
 
@@ -29,9 +31,15 @@ public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.Cate
         this.listener = listener;
     }
 
-    public void setCategorias(List<Categoria> categorias) {
-        this.categorias = categorias;
-        notifyDataSetChanged();
+    /** CORRIGIDO: DiffUtil no lugar de notifyDataSetChanged(). */
+    public void setCategorias(List<Categoria> newList) {
+        if (newList == null) newList = new ArrayList<>();
+
+        DiffUtil.DiffResult result = DiffUtil.calculateDiff(
+                new CategoriaDiffCallback(this.categorias, newList));
+
+        this.categorias = new ArrayList<>(newList);
+        result.dispatchUpdatesTo(this);
     }
 
     @NonNull
@@ -52,10 +60,12 @@ public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.Cate
         return categorias.size();
     }
 
+    // ── ViewHolder ────────────────────────────────────────────────────────────
+
     public class CategoriaViewHolder extends RecyclerView.ViewHolder {
 
         private final ImageView ivIcone;
-        private final TextView tvNome;
+        private final TextView  tvNome;
 
         public CategoriaViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -66,7 +76,6 @@ public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.Cate
         public void bind(Categoria categoria) {
             tvNome.setText(categoria.getNome());
 
-            // Carrega ícone — tenta URL remota, senão usa recurso local
             if (categoria.getIconeUrl() != null && !categoria.getIconeUrl().isEmpty()) {
                 Glide.with(itemView.getContext())
                         .load(categoria.getIconeUrl())
@@ -78,12 +87,40 @@ public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.Cate
                 ivIcone.setImageResource(R.drawable.ic_categoria_placeholder);
             }
 
-            // Destaque visual na categoria selecionada
             itemView.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onCategoriaClick(categoria);
-                }
+                if (listener != null) listener.onCategoriaClick(categoria);
             });
+        }
+    }
+
+    // ── DiffCallback ──────────────────────────────────────────────────────────
+
+    private static class CategoriaDiffCallback extends DiffUtil.Callback {
+
+        private final List<Categoria> oldList;
+        private final List<Categoria> newList;
+
+        CategoriaDiffCallback(List<Categoria> oldList, List<Categoria> newList) {
+            this.oldList = oldList;
+            this.newList = newList;
+        }
+
+        @Override
+        public int getOldListSize() { return oldList.size(); }
+
+        @Override
+        public int getNewListSize() { return newList.size(); }
+
+        @Override
+        public boolean areItemsTheSame(int oldPos, int newPos) {
+            return Objects.equals(oldList.get(oldPos).getId(),
+                    newList.get(newPos).getId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldPos, int newPos) {
+            return Objects.equals(oldList.get(oldPos).getNome(),
+                    newList.get(newPos).getNome());
         }
     }
 }

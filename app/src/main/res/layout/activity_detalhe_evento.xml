@@ -8,7 +8,6 @@
     android:background="@color/background"
     android:fitsSystemWindows="true">
 
-    <!-- Toolbar simples SEM CollapsingToolbarLayout -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -19,6 +18,16 @@
         app:navigationIconTint="@color/on_primary"
         app:titleTextColor="@color/on_primary" />
 
+    <!-- ADICIONADO: ProgressBar de loading -->
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="32dp"
+        android:indeterminateTint="@color/primary"
+        android:visibility="gone" />
+
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -28,7 +37,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Imagem do evento -->
             <ImageView
                 android:id="@+id/iv_imagem_evento"
                 android:layout_width="match_parent"
@@ -42,12 +50,11 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- Nome -->
                 <TextView
                     android:id="@+id/tv_nome_evento"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Nome do Evento"
+                    android:text="@string/detalhes"
                     android:textColor="@color/on_surface"
                     android:textSize="22sp"
                     android:textStyle="bold" />
@@ -80,7 +87,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Data"
+                            android:text="@string/data_hora"
                             android:textColor="@color/text_secondary"
                             android:textSize="12sp" />
 
@@ -88,7 +95,7 @@
                             android:id="@+id/tv_data_evento"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="00/00/0000"
+                            android:text="--/--/----"
                             android:textColor="@color/on_surface"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -118,7 +125,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Horário"
+                            android:text="@string/horario"
                             android:textColor="@color/text_secondary"
                             android:textSize="12sp" />
 
@@ -126,7 +133,7 @@
                             android:id="@+id/tv_hora_evento"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="00h00"
+                            android:text="--h--"
                             android:textColor="@color/on_surface"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -164,7 +171,7 @@
                             android:id="@+id/tv_local_evento"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Local do Evento"
+                            android:text="--"
                             android:textColor="@color/on_surface"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -177,7 +184,6 @@
                     android:layout_marginTop="12dp"
                     android:layout_marginBottom="12dp" />
 
-                <!-- Descrição -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -192,11 +198,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:lineSpacingExtra="4dp"
-                    android:text="Descrição do evento."
+                    android:text="--"
                     android:textColor="@color/on_surface"
                     android:textSize="15sp" />
 
-                <!-- Botão Ver Mapa -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_ver_mapa"
                     style="@style/ButtonPrimary"
@@ -207,14 +212,14 @@
                     app:icon="@drawable/ic_map"
                     app:iconTint="@color/on_primary" />
 
-                <!-- Botão Favoritar -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/fab_favorito"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Favoritar"
+                    android:layout_marginBottom="16dp"
+                    android:text="@string/favoritar"
                     android:textColor="@color/primary"
                     app:icon="@drawable/ic_favorite_border"
                     app:iconTint="@color/primary"

@@ -4,6 +4,8 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.eventosibirama.R;
 import com.example.eventosibirama.view.fragment.FavoritosFragment;
@@ -12,7 +14,14 @@ import com.example.eventosibirama.view.fragment.MapaFragment;
 import com.example.eventosibirama.view.fragment.PerfilFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+
 public class MainActivity extends AppCompatActivity {
+
+    private HomeFragment      homeFragment;
+    private FavoritosFragment favoritosFragment;
+    private MapaFragment      mapaFragment;
+    private PerfilFragment    perfilFragment;
+    private Fragment          activeFragment;
 
     private BottomNavigationView bottomNavigationView;
 
@@ -23,37 +32,70 @@ public class MainActivity extends AppCompatActivity {
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
 
-        // Fragment inicial
         if (savedInstanceState == null) {
-            carregarFragment(new HomeFragment());
+            // Primeira criação: instancia e adiciona todos os fragments
+            configurarFragments();
+        } else {
+            // Restauração após rotação: recupera instâncias existentes
+            restaurarFragments();
         }
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
-            Fragment fragment = null;
             int id = item.getItemId();
-
             if (id == R.id.nav_home) {
-                fragment = new HomeFragment();
+                mostrarFragment(homeFragment);
             } else if (id == R.id.nav_favoritos) {
-                fragment = new FavoritosFragment();
+                mostrarFragment(favoritosFragment);
             } else if (id == R.id.nav_mapa) {
-                fragment = new MapaFragment();
+                mostrarFragment(mapaFragment);
             } else if (id == R.id.nav_perfil) {
-                fragment = new PerfilFragment();
+                mostrarFragment(perfilFragment);
+            } else {
+                return false;
             }
-
-            if (fragment != null) {
-                carregarFragment(fragment);
-                return true;
-            }
-            return false;
+            return true;
         });
     }
 
-    private void carregarFragment(Fragment fragment) {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, fragment)
+    /** Adiciona todos os fragments de uma vez, escondendo os que não são ativos. */
+    private void configurarFragments() {
+        homeFragment      = new HomeFragment();
+        favoritosFragment = new FavoritosFragment();
+        mapaFragment      = new MapaFragment();
+        perfilFragment    = new PerfilFragment();
+
+        FragmentManager fm = getSupportFragmentManager();
+        fm.beginTransaction()
+                .add(R.id.fragment_container, perfilFragment,    "perfil").hide(perfilFragment)
+                .add(R.id.fragment_container, mapaFragment,      "mapa").hide(mapaFragment)
+                .add(R.id.fragment_container, favoritosFragment, "favoritos").hide(favoritosFragment)
+                .add(R.id.fragment_container, homeFragment,      "home")
                 .commit();
+
+        activeFragment = homeFragment;
+    }
+
+    /** Recupera os fragments salvos pelo FragmentManager após rotação/recriação. */
+    private void restaurarFragments() {
+        FragmentManager fm = getSupportFragmentManager();
+        homeFragment      = (HomeFragment)      fm.findFragmentByTag("home");
+        favoritosFragment = (FavoritosFragment) fm.findFragmentByTag("favoritos");
+        mapaFragment      = (MapaFragment)      fm.findFragmentByTag("mapa");
+        perfilFragment    = (PerfilFragment)    fm.findFragmentByTag("perfil");
+
+        // Descobre qual está visível
+        for (Fragment f : fm.getFragments()) {
+            if (!f.isHidden()) { activeFragment = f; break; }
+        }
+        if (activeFragment == null) activeFragment = homeFragment;
+    }
+
+    /** Alterna entre fragments sem recriar — usa show/hide para preservar o estado. */
+    private void mostrarFragment(Fragment target) {
+        if (target == null || target == activeFragment) return;
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.hide(activeFragment).show(target).commit();
+        activeFragment = target;
     }
 }

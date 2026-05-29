@@ -3,7 +3,9 @@ package com.example.eventosibirama.view.activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,20 +21,21 @@ import com.google.android.material.button.MaterialButton;
 
 public class DetalhesEventoActivity extends AppCompatActivity {
 
-    private ImageView ivImagem;
-    private TextView tvNome, tvData, tvHora, tvLocal, tvDescricao;
+    private ImageView      ivImagem;
+    private TextView       tvNome, tvData, tvHora, tvLocal, tvDescricao;
     private MaterialButton btnVerMapa, fabFavorito;
+    private ProgressBar    progressBar;
 
     private DetalhesEventoViewModel viewModel;
-    private String eventoId;
-    private boolean isFavorito = false;
+    private String                  eventoId;
+    private boolean                 isFavorito = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detalhe_evento);
 
-        eventoId = getIntent().getStringExtra("evento_id");
+        eventoId  = getIntent().getStringExtra("evento_id");
         viewModel = new ViewModelProvider(this).get(DetalhesEventoViewModel.class);
 
         inicializarViews();
@@ -47,8 +50,6 @@ public class DetalhesEventoActivity extends AppCompatActivity {
     private void inicializarViews() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        // Botão voltar funcionando
         toolbar.setNavigationOnClickListener(v -> finish());
 
         ivImagem    = findViewById(R.id.iv_imagem_evento);
@@ -59,21 +60,37 @@ public class DetalhesEventoActivity extends AppCompatActivity {
         tvDescricao = findViewById(R.id.tv_descricao_evento);
         btnVerMapa  = findViewById(R.id.btn_ver_mapa);
         fabFavorito = findViewById(R.id.fab_favorito);
+        progressBar = findViewById(R.id.progress_bar);
     }
 
     private void observarViewModel() {
+        // Loading
+        viewModel.getIsLoading().observe(this, isLoading -> {
+            if (isLoading != null) {
+                progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+            }
+        });
+
+        // Dados do evento
         viewModel.getEvento().observe(this, evento -> {
             if (evento != null) preencherDados(evento);
         });
 
+        // Estado do favorito
         viewModel.isFavorito().observe(this, favorito -> {
-            isFavorito = favorito;
+            isFavorito = Boolean.TRUE.equals(favorito);
+            // CORRIGIDO: textos usam @string em vez de strings hardcoded
             fabFavorito.setIconResource(
-                    favorito ? R.drawable.ic_favorite : R.drawable.ic_favorite_border
-            );
-            fabFavorito.setText(favorito ? "Favoritado" : "Favoritar");
+                    isFavorito ? R.drawable.ic_favorite : R.drawable.ic_favorite_border);
+            fabFavorito.setText(
+                    isFavorito ? R.string.favoritado : R.string.favoritar);
+            fabFavorito.setTextColor(getColor(
+                    isFavorito ? R.color.favorite_active : R.color.primary));
+            fabFavorito.setIconTint(getColorStateList(
+                    isFavorito ? R.color.favorite_active : R.color.primary));
         });
 
+        // Mensagens de feedback (SingleLiveEvent — aparecem apenas uma vez)
         viewModel.getMensagem().observe(this, mensagem -> {
             if (mensagem != null)
                 Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show();
@@ -93,18 +110,7 @@ public class DetalhesEventoActivity extends AppCompatActivity {
                 .centerCrop()
                 .into(ivImagem);
 
-        btnVerMapa.setOnClickListener(v -> {
-            String uri = "geo:" + evento.getLatitude() + "," + evento.getLongitude()
-                    + "?q=" + Uri.encode(evento.getLocal());
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-            intent.setPackage("com.google.android.apps.maps");
-            if (intent.resolveActivity(getPackageManager()) != null) {
-                startActivity(intent);
-            } else {
-                Toast.makeText(this,
-                        "Google Maps não encontrado", Toast.LENGTH_SHORT).show();
-            }
-        });
+        btnVerMapa.setOnClickListener(v -> abrirMapa(evento));
 
         fabFavorito.setOnClickListener(v -> {
             if (isFavorito) {
@@ -113,5 +119,17 @@ public class DetalhesEventoActivity extends AppCompatActivity {
                 viewModel.adicionarFavorito(eventoId);
             }
         });
+    }
+
+    private void abrirMapa(Evento evento) {
+        String uri = "geo:" + evento.getLatitude() + "," + evento.getLongitude()
+                + "?q=" + Uri.encode(evento.getLocal());
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+        intent.setPackage("com.google.android.apps.maps");
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, R.string.maps_nao_encontrado, Toast.LENGTH_SHORT).show();
+        }
     }
 }

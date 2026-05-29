@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,9 +23,11 @@ import com.example.eventosibirama.viewmodel.FavoritosViewModel;
 
 public class FavoritosFragment extends Fragment {
 
-    private RecyclerView rvFavoritos;
-    private TextView tvVazio;
-    private EventoAdapter eventoAdapter;
+    private RecyclerView     rvFavoritos;
+    private TextView         tvVazio;
+    private ProgressBar      progressBar;
+
+    private EventoAdapter    eventoAdapter;
     private FavoritosViewModel favoritosViewModel;
 
     @Nullable
@@ -42,9 +46,18 @@ public class FavoritosFragment extends Fragment {
 
         rvFavoritos = view.findViewById(R.id.rv_favoritos);
         tvVazio     = view.findViewById(R.id.tv_vazio);
+        progressBar = view.findViewById(R.id.progress_bar);
 
         configurarRecycler();
         observarViewModel();
+    }
+
+    // Recarrega os favoritos toda vez que a aba é aberta,
+    // para refletir favoritos adicionados/removidos em outras telas.
+    @Override
+    public void onResume() {
+        super.onResume();
+        favoritosViewModel.carregarFavoritos();
     }
 
     private void configurarRecycler() {
@@ -59,6 +72,24 @@ public class FavoritosFragment extends Fragment {
     }
 
     private void observarViewModel() {
+        // Loading
+        favoritosViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
+            if (isLoading == null) return;
+            progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+            if (isLoading) {
+                tvVazio.setVisibility(View.GONE);
+                rvFavoritos.setVisibility(View.GONE);
+            }
+        });
+
+        // Erro
+        favoritosViewModel.getErro().observe(getViewLifecycleOwner(), erro -> {
+            if (erro != null) {
+                Toast.makeText(getContext(), erro, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Dados
         favoritosViewModel.getFavoritos().observe(getViewLifecycleOwner(), eventos -> {
             if (eventos == null || eventos.isEmpty()) {
                 tvVazio.setVisibility(View.VISIBLE);
@@ -69,7 +100,5 @@ public class FavoritosFragment extends Fragment {
                 eventoAdapter.setEventos(eventos);
             }
         });
-
-        favoritosViewModel.carregarFavoritos();
     }
 }

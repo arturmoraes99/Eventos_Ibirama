@@ -6,31 +6,31 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.eventosibirama.R;
 import com.example.eventosibirama.view.activity.AuthActivity;
 import com.example.eventosibirama.view.activity.MainActivity;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.eventosibirama.viewmodel.AuthViewModel;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
-import java.util.HashMap;
-import java.util.Map;
 
 public class CadastroFragment extends Fragment {
 
-    private EditText etNome, etEmail, etSenha, etConfirmarSenha;
-    private Button btnCadastrar;
-    private TextView tvIrLogin;
-    private FirebaseAuth mAuth;
-    private FirebaseFirestore db;
+    private TextInputLayout    tilNome, tilEmail, tilSenha, tilConfirmarSenha;
+    private TextInputEditText  etNome, etEmail, etSenha, etConfirmarSenha;
+    private MaterialButton     btnCadastrar, tvIrLogin;
+    private ProgressBar        progressBar;
+
+    private AuthViewModel authViewModel;
 
     @Nullable
     @Override
@@ -44,15 +44,19 @@ public class CadastroFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mAuth = FirebaseAuth.getInstance();
-        db    = FirebaseFirestore.getInstance();
+        authViewModel = new ViewModelProvider(requireActivity()).get(AuthViewModel.class);
 
-        etNome           = view.findViewById(R.id.et_nome);
-        etEmail          = view.findViewById(R.id.et_email);
-        etSenha          = view.findViewById(R.id.et_senha);
-        etConfirmarSenha = view.findViewById(R.id.et_confirmar_senha);
-        btnCadastrar     = view.findViewById(R.id.btn_cadastrar);
-        tvIrLogin        = view.findViewById(R.id.tv_ir_login);
+        tilNome           = view.findViewById(R.id.tilNome);
+        tilEmail          = view.findViewById(R.id.tilEmail);
+        tilSenha          = view.findViewById(R.id.tilSenha);
+        tilConfirmarSenha = view.findViewById(R.id.tilConfirmarSenha);
+        etNome            = view.findViewById(R.id.et_nome);
+        etEmail           = view.findViewById(R.id.et_email);
+        etSenha           = view.findViewById(R.id.et_senha);
+        etConfirmarSenha  = view.findViewById(R.id.et_confirmar_senha);
+        btnCadastrar      = view.findViewById(R.id.btn_cadastrar);
+        tvIrLogin         = view.findViewById(R.id.tv_ir_login);
+        progressBar       = view.findViewById(R.id.progress_bar);
 
         btnCadastrar.setOnClickListener(v -> realizarCadastro());
 
@@ -61,70 +65,58 @@ public class CadastroFragment extends Fragment {
                 ((AuthActivity) getActivity()).carregarFragment(new LoginFragment());
             }
         });
+
+        observarViewModel();
     }
 
     private void realizarCadastro() {
-        String nome           = etNome.getText().toString().trim();
-        String email          = etEmail.getText().toString().trim();
-        String senha          = etSenha.getText().toString().trim();
-        String confirmarSenha = etConfirmarSenha.getText().toString().trim();
+        // Limpa erros anteriores
+        tilNome.setError(null);
+        tilEmail.setError(null);
+        tilSenha.setError(null);
+        tilConfirmarSenha.setError(null);
+
+        String nome           = etNome.getText()           != null ? etNome.getText().toString().trim()           : "";
+        String email          = etEmail.getText()          != null ? etEmail.getText().toString().trim()          : "";
+        String senha          = etSenha.getText()          != null ? etSenha.getText().toString().trim()          : "";
+        String confirmarSenha = etConfirmarSenha.getText() != null ? etConfirmarSenha.getText().toString().trim() : "";
 
         if (TextUtils.isEmpty(nome)) {
-            etNome.setError("Informe seu nome");
+            tilNome.setError(getString(R.string.erro_campos_vazios));
             return;
         }
         if (TextUtils.isEmpty(email)) {
-            etEmail.setError("Informe o e-mail");
+            tilEmail.setError(getString(R.string.erro_email_invalido));
             return;
         }
-        if (TextUtils.isEmpty(senha)) {
-            etSenha.setError("Informe a senha");
-            return;
-        }
-        if (senha.length() < 6) {
-            etSenha.setError("Senha deve ter no mínimo 6 caracteres");
+        if (TextUtils.isEmpty(senha) || senha.length() < 6) {
+            tilSenha.setError(getString(R.string.erro_senha_curta));
             return;
         }
         if (!senha.equals(confirmarSenha)) {
-            etConfirmarSenha.setError("As senhas não coincidem");
+            tilConfirmarSenha.setError(getString(R.string.erro_senhas_diferentes));
             return;
         }
 
-        btnCadastrar.setEnabled(false);
-
-        mAuth.createUserWithEmailAndPassword(email, senha)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        salvarUsuarioNoFirestore(nome, email);
-                    } else {
-                        Toast.makeText(getContext(),
-                                "Erro: " + task.getException().getMessage(),
-                                Toast.LENGTH_LONG).show();
-                        btnCadastrar.setEnabled(true);
-                    }
-                });
+        // Delega ao ViewModel — Fragment não conhece Firebase
+        authViewModel.cadastrar(nome, email, senha);
     }
 
-    private void salvarUsuarioNoFirestore(String nome, String email) {
-        String uid = mAuth.getCurrentUser().getUid();
+    private void observarViewModel() {
+        authViewModel.getAuthState().observe(getViewLifecycleOwner(), resource -> {
+            if (resource == null) return;
 
-        Map<String, Object> usuario = new HashMap<>();
-        usuario.put("nome", nome);
-        usuario.put("email", email);
-        usuario.put("uid", uid);
+            progressBar.setVisibility(resource.isLoading() ? View.VISIBLE : View.GONE);
+            btnCadastrar.setEnabled(!resource.isLoading());
 
-        db.collection("usuarios")
-                .document(uid)
-                .set(usuario)
-                .addOnSuccessListener(unused -> {
-                    startActivity(new Intent(getActivity(), MainActivity.class));
-                    requireActivity().finish();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(),
-                            "Erro ao salvar usuário: " + e.getMessage(),
-                            Toast.LENGTH_LONG).show();
-                    btnCadastrar.setEnabled(true);
-                });
+            if (resource.isError()) {
+                Toast.makeText(getContext(), resource.message, Toast.LENGTH_LONG).show();
+            }
+        });
+
+        authViewModel.getNavegar().observe(getViewLifecycleOwner(), unused -> {
+            startActivity(new Intent(requireActivity(), MainActivity.class));
+            requireActivity().finish();
+        });
     }
 }
