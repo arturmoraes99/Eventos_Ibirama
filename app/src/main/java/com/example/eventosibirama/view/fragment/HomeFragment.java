@@ -35,6 +35,8 @@ public class HomeFragment extends Fragment {
     private EventoAdapter     eventoAdapter;
     private EventoViewModel   eventoViewModel;
 
+    private TextWatcher buscaWatcher;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -59,24 +61,29 @@ public class HomeFragment extends Fragment {
         observarViewModel();
         configurarBusca();
 
-        // Carga inicial
         carregarDadosIniciais();
     }
 
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        if (!hidden) {
-            resetar();
-        }
+        if (!hidden) resetar();
     }
 
-    // ── Configuração dos RecyclerViews ────────────────────────────────────────
+    // ── RecyclerViews ─────────────────────────────────────────────────────────
 
     private void configurarRecyclerCategorias() {
         categoriaAdapter = new CategoriaAdapter(categoria -> {
-            // Limpa a busca antes de filtrar por categoria
-            if (etBusca != null) etBusca.setText("");
+            // FIX #6: marca a categoria clicada como selecionada no adapter
+            categoriaAdapter.setSelectedId(categoria.getId());
+
+            // Limpa o campo de busca sem disparar o watcher
+            if (etBusca != null && buscaWatcher != null) {
+                etBusca.removeTextChangedListener(buscaWatcher);
+                etBusca.setText("");
+                etBusca.addTextChangedListener(buscaWatcher);
+            }
+
             eventoViewModel.buscarEventosPorCategoria(categoria.getId());
         });
 
@@ -99,15 +106,12 @@ public class HomeFragment extends Fragment {
 
     private void observarViewModel() {
         eventoViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
-            if (isLoading != null) {
+            if (isLoading != null)
                 progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
-            }
         });
 
         eventoViewModel.getErro().observe(getViewLifecycleOwner(), erro -> {
-            if (erro != null) {
-                Toast.makeText(getContext(), erro, Toast.LENGTH_SHORT).show();
-            }
+            if (erro != null) Toast.makeText(getContext(), erro, Toast.LENGTH_SHORT).show();
         });
 
         eventoViewModel.getCategorias().observe(getViewLifecycleOwner(),
@@ -120,7 +124,7 @@ public class HomeFragment extends Fragment {
     // ── Busca por texto ───────────────────────────────────────────────────────
 
     private void configurarBusca() {
-        etBusca.addTextChangedListener(new TextWatcher() {
+        buscaWatcher = new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void afterTextChanged(Editable s) {}
 
@@ -128,23 +132,33 @@ public class HomeFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String query = s.toString().trim();
                 if (query.isEmpty()) {
+                    // FIX #6: ao apagar a busca manualmente, remove destaque da categoria
+                    categoriaAdapter.setSelectedId(null);
                     eventoViewModel.carregarTodosEventos();
                 } else {
+                    // Busca por texto → remove seleção de categoria
+                    categoriaAdapter.setSelectedId(null);
                     eventoViewModel.buscarEventosPorNome(query);
                 }
             }
-        });
+        };
+        etBusca.addTextChangedListener(buscaWatcher);
     }
 
     // ── Reset / carga inicial ─────────────────────────────────────────────────
 
-
     private void resetar() {
-        // Limpa o campo de busca sem disparar o TextWatcher
-        if (etBusca != null) {
-            etBusca.removeTextChangedListener(null);
+        if (etBusca != null && buscaWatcher != null) {
+            etBusca.removeTextChangedListener(buscaWatcher);
             etBusca.setText("");
+            etBusca.addTextChangedListener(buscaWatcher);
         }
+
+        // FIX #6: remove o destaque de categoria ao voltar para a tela inicial
+        if (categoriaAdapter != null) {
+            categoriaAdapter.setSelectedId(null);
+        }
+
         carregarDadosIniciais();
     }
 

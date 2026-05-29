@@ -20,7 +20,6 @@ import com.example.eventosibirama.viewmodel.FavoritosViewModel;
 import com.example.eventosibirama.viewmodel.PerfilViewModel;
 import com.google.android.material.button.MaterialButton;
 
-
 public class PerfilFragment extends Fragment {
 
     private TextView       tvNome, tvEmail, tvQtdFavoritos;
@@ -52,32 +51,34 @@ public class PerfilFragment extends Fragment {
         progressBar    = view.findViewById(R.id.progress_bar);
 
         observarViewModel();
-
-        // CORRIGIDO: Fragment apenas chama o ViewModel; Firebase fica no Repository
         btnLogout.setOnClickListener(v -> realizarLogout());
-    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+        // Carga inicial (onHiddenChanged não é chamado na criação)
         perfilViewModel.carregarPerfil();
         favoritosViewModel.carregarFavoritos();
     }
 
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden) {
+            perfilViewModel.carregarPerfil();
+            favoritosViewModel.carregarFavoritos();
+        }
+    }
+
     private void observarViewModel() {
-        // Loading
         perfilViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
             if (isLoading != null) {
                 progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
             }
         });
 
-        // Erro
         perfilViewModel.getErro().observe(getViewLifecycleOwner(), erro -> {
             if (erro != null) Toast.makeText(getContext(), erro, Toast.LENGTH_SHORT).show();
         });
 
-        // Dados do usuário
         perfilViewModel.getUsuario().observe(getViewLifecycleOwner(), usuario -> {
             if (usuario != null) {
                 tvNome.setText(usuario.getNome());
@@ -85,11 +86,9 @@ public class PerfilFragment extends Fragment {
             }
         });
 
-        // Contagem de favoritos
         favoritosViewModel.getFavoritos().observe(getViewLifecycleOwner(), eventos ->
                 tvQtdFavoritos.setText(eventos != null ? String.valueOf(eventos.size()) : "0"));
     }
-
 
     private void realizarLogout() {
         perfilViewModel.logout();
