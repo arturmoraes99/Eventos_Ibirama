@@ -8,7 +8,6 @@
     android:background="@color/background"
     android:fitsSystemWindows="true">
 
-    <!-- Toolbar -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,7 +22,6 @@
             app:titleTextColor="@color/on_primary" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Campo de busca -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilBusca"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -41,7 +39,6 @@
             android:maxLines="1" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- ProgressBar de loading -->
     <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"
@@ -50,18 +47,6 @@
         android:indeterminateTint="@color/primary"
         android:visibility="gone" />
 
-    <!--
-        CORRIGIDO: NestedScrollView no lugar de ScrollView.
-
-        ScrollView comum entra em conflito com RecyclerView — o conteúdo
-        não é medido corretamente e o scroll para antes do final.
-
-        NestedScrollView resolve isso e é o componente recomendado pelo
-        Google para conter RecyclerViews com nestedScrollingEnabled=false.
-
-        paddingBottom="80dp" + clipToPadding="false" garante que o último
-        item não fique escondido atrás da BottomNavigationView.
-    -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -75,7 +60,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Título Categorias -->
+            <!-- Categorias -->
             <TextView
                 android:id="@+id/tvCategorias"
                 android:layout_width="wrap_content"
@@ -87,11 +72,6 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <!--
-                RecyclerView de categorias:
-                nestedScrollingEnabled="false" obrigatório dentro de NestedScrollView
-                para que todos os itens sejam renderizados de uma vez (wrap_content).
-            -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_categorias"
                 android:layout_width="match_parent"
@@ -114,6 +94,50 @@
                 android:textColor="@color/on_surface"
                 android:textSize="18sp"
                 android:textStyle="bold" />
+
+            <!--
+                NOVO: Estado vazio — aparece quando a busca ou filtro
+                de categoria não retorna nenhum evento.
+                Visível apenas quando a lista está vazia e não está carregando.
+            -->
+            <LinearLayout
+                android:id="@+id/layout_vazio_eventos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/ic_evento_placeholder"
+                    android:tint="@color/text_secondary"
+                    android:alpha="0.5" />
+
+                <TextView
+                    android:id="@+id/tv_vazio_eventos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/nenhum_evento"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="15sp"
+                    android:gravity="center" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_limpar_filtro"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/ver_todos_eventos"
+                    android:textColor="@color/primary"
+                    android:visibility="gone" />
+
+            </LinearLayout>
 
             <!-- RecyclerView de eventos -->
             <androidx.recyclerview.widget.RecyclerView

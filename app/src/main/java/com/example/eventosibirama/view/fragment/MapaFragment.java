@@ -1,5 +1,6 @@
 package com.example.eventosibirama.view.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,22 +13,27 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.eventosibirama.R;
 import com.example.eventosibirama.model.Evento;
+import com.example.eventosibirama.view.activity.DetalhesEventoActivity;
 import com.example.eventosibirama.viewmodel.EventoViewModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MapaFragment extends Fragment implements OnMapReadyCallback {
 
-    private GoogleMap mMap;
+    private GoogleMap       mMap;
     private EventoViewModel eventoViewModel;
 
-    // Coordenadas de Ibirama - SC
+    private final Map<String, Evento> markerEventoMap = new HashMap<>();
+
     private static final LatLng IBIRAMA = new LatLng(-27.0572, -49.5197);
 
     @Nullable
@@ -56,27 +62,55 @@ public class MapaFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Centraliza em Ibirama
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(IBIRAMA, 13f));
 
-        // Observa eventos e adiciona marcadores
-        eventoViewModel.getEventos().observe(getViewLifecycleOwner(), this::adicionarMarcadores);
+        configurarCliqueMarcador();
+
+        eventoViewModel.getEventos().observe(getViewLifecycleOwner(),
+                this::adicionarMarcadores);
         eventoViewModel.carregarTodosEventos();
     }
+
+    // ── Marcadores ────────────────────────────────────────────────────────────
 
     private void adicionarMarcadores(List<Evento> eventos) {
         if (mMap == null || eventos == null) return;
 
         mMap.clear();
+        markerEventoMap.clear();
 
         for (Evento evento : eventos) {
             if (evento.getLatitude() != 0 && evento.getLongitude() != 0) {
                 LatLng posicao = new LatLng(evento.getLatitude(), evento.getLongitude());
-                mMap.addMarker(new MarkerOptions()
+
+                Marker marker = mMap.addMarker(new MarkerOptions()
                         .position(posicao)
                         .title(evento.getNome())
-                        .snippet(evento.getLocal()));
+                        .snippet(evento.getLocal() + " · " + evento.getData()));
+
+                // NOVO: usa o ID do Marker (gerado pelo Maps) como chave
+                if (marker != null) {
+                    markerEventoMap.put(marker.getId(), evento);
+                }
             }
         }
+    }
+
+    // ── Clique nos marcadores ─────────────────────────────────────────────────
+
+    private void configurarCliqueMarcador() {
+        mMap.setOnMarkerClickListener(marker -> {
+            // Retorna false → Maps exibe a InfoWindow automaticamente
+            return false;
+        });
+
+        mMap.setOnInfoWindowClickListener(marker -> {
+            Evento evento = markerEventoMap.get(marker.getId());
+            if (evento != null) {
+                Intent intent = new Intent(getActivity(), DetalhesEventoActivity.class);
+                intent.putExtra("evento_id", evento.getId());
+                startActivity(intent);
+            }
+        });
     }
 }

@@ -14,7 +14,6 @@ import com.example.eventosibirama.view.fragment.MapaFragment;
 import com.example.eventosibirama.view.fragment.PerfilFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-
 public class MainActivity extends AppCompatActivity {
 
     private HomeFragment      homeFragment;
@@ -33,17 +32,21 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
 
         if (savedInstanceState == null) {
-            // Primeira criação: instancia e adiciona todos os fragments
             configurarFragments();
         } else {
-            // Restauração após rotação: recupera instâncias existentes
             restaurarFragments();
         }
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
+
             if (id == R.id.nav_home) {
-                mostrarFragment(homeFragment);
+                if (activeFragment == homeFragment) {
+                    homeFragment.resetar();
+                } else {
+                    mostrarFragment(homeFragment);
+                }
+
             } else if (id == R.id.nav_favoritos) {
                 mostrarFragment(favoritosFragment);
             } else if (id == R.id.nav_mapa) {
@@ -53,11 +56,11 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 return false;
             }
+
             return true;
         });
     }
 
-    /** Adiciona todos os fragments de uma vez, escondendo os que não são ativos. */
     private void configurarFragments() {
         homeFragment      = new HomeFragment();
         favoritosFragment = new FavoritosFragment();
@@ -75,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
         activeFragment = homeFragment;
     }
 
-    /** Recupera os fragments salvos pelo FragmentManager após rotação/recriação. */
     private void restaurarFragments() {
         FragmentManager fm = getSupportFragmentManager();
         homeFragment      = (HomeFragment)      fm.findFragmentByTag("home");
@@ -83,14 +85,12 @@ public class MainActivity extends AppCompatActivity {
         mapaFragment      = (MapaFragment)      fm.findFragmentByTag("mapa");
         perfilFragment    = (PerfilFragment)    fm.findFragmentByTag("perfil");
 
-        // Descobre qual está visível
         for (Fragment f : fm.getFragments()) {
             if (!f.isHidden()) { activeFragment = f; break; }
         }
         if (activeFragment == null) activeFragment = homeFragment;
     }
 
-    /** Alterna entre fragments sem recriar — usa show/hide para preservar o estado. */
     private void mostrarFragment(Fragment target) {
         if (target == null || target == activeFragment) return;
 

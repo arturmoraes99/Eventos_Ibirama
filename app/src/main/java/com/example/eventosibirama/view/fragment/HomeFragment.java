@@ -7,7 +7,9 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,6 +25,7 @@ import com.example.eventosibirama.adapter.CategoriaAdapter;
 import com.example.eventosibirama.adapter.EventoAdapter;
 import com.example.eventosibirama.view.activity.DetalhesEventoActivity;
 import com.example.eventosibirama.viewmodel.EventoViewModel;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
 public class HomeFragment extends Fragment {
@@ -30,12 +33,15 @@ public class HomeFragment extends Fragment {
     private RecyclerView      rvCategorias, rvEventos;
     private TextInputEditText etBusca;
     private ProgressBar       progressBar;
+    private LinearLayout      layoutVazioEventos;
+    private TextView          tvVazioEventos;
+    private MaterialButton    btnLimparFiltro;
 
-    private CategoriaAdapter  categoriaAdapter;
-    private EventoAdapter     eventoAdapter;
-    private EventoViewModel   eventoViewModel;
-
-    private TextWatcher buscaWatcher;
+    private CategoriaAdapter categoriaAdapter;
+    private EventoAdapter    eventoAdapter;
+    private EventoViewModel  eventoViewModel;
+    private TextWatcher      buscaWatcher;
+    private boolean          filtroAtivo = false;
 
     @Nullable
     @Override
@@ -51,15 +57,20 @@ public class HomeFragment extends Fragment {
 
         eventoViewModel = new ViewModelProvider(this).get(EventoViewModel.class);
 
-        etBusca      = view.findViewById(R.id.et_busca);
-        rvCategorias = view.findViewById(R.id.rv_categorias);
-        rvEventos    = view.findViewById(R.id.rv_eventos);
-        progressBar  = view.findViewById(R.id.progress_bar);
+        etBusca            = view.findViewById(R.id.et_busca);
+        rvCategorias       = view.findViewById(R.id.rv_categorias);
+        rvEventos          = view.findViewById(R.id.rv_eventos);
+        progressBar        = view.findViewById(R.id.progress_bar);
+        layoutVazioEventos = view.findViewById(R.id.layout_vazio_eventos);
+        tvVazioEventos     = view.findViewById(R.id.tv_vazio_eventos);
+        btnLimparFiltro    = view.findViewById(R.id.btn_limpar_filtro);
 
         configurarRecyclerCategorias();
         configurarRecyclerEventos();
         observarViewModel();
         configurarBusca();
+
+        btnLimparFiltro.setOnClickListener(v -> resetar());
 
         carregarDadosIniciais();
     }
@@ -74,10 +85,9 @@ public class HomeFragment extends Fragment {
 
     private void configurarRecyclerCategorias() {
         categoriaAdapter = new CategoriaAdapter(categoria -> {
-            // FIX #6: marca a categoria clicada como selecionada no adapter
+            filtroAtivo = true;
             categoriaAdapter.setSelectedId(categoria.getId());
 
-            // Limpa o campo de busca sem disparar o watcher
             if (etBusca != null && buscaWatcher != null) {
                 etBusca.removeTextChangedListener(buscaWatcher);
                 etBusca.setText("");
@@ -106,8 +116,12 @@ public class HomeFragment extends Fragment {
 
     private void observarViewModel() {
         eventoViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
-            if (isLoading != null)
-                progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+            if (isLoading == null) return;
+            progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+            if (isLoading) {
+                layoutVazioEventos.setVisibility(View.GONE);
+                rvEventos.setVisibility(View.GONE);
+            }
         });
 
         eventoViewModel.getErro().observe(getViewLifecycleOwner(), erro -> {
@@ -117,8 +131,30 @@ public class HomeFragment extends Fragment {
         eventoViewModel.getCategorias().observe(getViewLifecycleOwner(),
                 categorias -> categoriaAdapter.setCategorias(categorias));
 
-        eventoViewModel.getEventos().observe(getViewLifecycleOwner(),
-                eventos -> eventoAdapter.setEventos(eventos));
+        eventoViewModel.getEventos().observe(getViewLifecycleOwner(), eventos -> {
+            eventoAdapter.setEventos(eventos);
+            atualizarEstadoVazio(eventos == null || eventos.isEmpty());
+        });
+    }
+
+    // ── Estado vazio ──────────────────────────────────────────────────────────
+
+    private void atualizarEstadoVazio(boolean vazio) {
+        if (vazio) {
+            rvEventos.setVisibility(View.GONE);
+            layoutVazioEventos.setVisibility(View.VISIBLE);
+
+            if (filtroAtivo) {
+                tvVazioEventos.setText(R.string.nenhum_evento_categoria);
+                btnLimparFiltro.setVisibility(View.VISIBLE);
+            } else {
+                tvVazioEventos.setText(R.string.nenhum_evento);
+                btnLimparFiltro.setVisibility(View.GONE);
+            }
+        } else {
+            layoutVazioEventos.setVisibility(View.GONE);
+            rvEventos.setVisibility(View.VISIBLE);
+        }
     }
 
     // ── Busca por texto ───────────────────────────────────────────────────────
@@ -132,11 +168,11 @@ public class HomeFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String query = s.toString().trim();
                 if (query.isEmpty()) {
-                    // FIX #6: ao apagar a busca manualmente, remove destaque da categoria
+                    filtroAtivo = false;
                     categoriaAdapter.setSelectedId(null);
                     eventoViewModel.carregarTodosEventos();
                 } else {
-                    // Busca por texto → remove seleção de categoria
+                    filtroAtivo = true;
                     categoriaAdapter.setSelectedId(null);
                     eventoViewModel.buscarEventosPorNome(query);
                 }
@@ -145,16 +181,17 @@ public class HomeFragment extends Fragment {
         etBusca.addTextChangedListener(buscaWatcher);
     }
 
-    // ── Reset / carga inicial ─────────────────────────────────────────────────
+    // ── Reset ─────────────────────────────────────────────────────────────────
 
-    private void resetar() {
+    public void resetar() {
+        filtroAtivo = false;
+
         if (etBusca != null && buscaWatcher != null) {
             etBusca.removeTextChangedListener(buscaWatcher);
             etBusca.setText("");
             etBusca.addTextChangedListener(buscaWatcher);
         }
 
-        // FIX #6: remove o destaque de categoria ao voltar para a tela inicial
         if (categoriaAdapter != null) {
             categoriaAdapter.setSelectedId(null);
         }
