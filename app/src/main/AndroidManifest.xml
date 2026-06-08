@@ -15,15 +15,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.EventosIbirama">
 
-        <!--
-            CORRIGIDO: A chave da API NÃO está mais hardcoded aqui.
-            O valor ${MAPS_API_KEY} é injetado pelo build.gradle.kts
-            lendo do arquivo local.properties (que está no .gitignore).
-
-            Como configurar:
-            1. Abra local.properties (raiz do projeto)
-            2. Adicione: MAPS_API_KEY=SuaChaveAqui
-        -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
@@ -50,6 +41,24 @@
 
         <activity
             android:name=".view.activity.DetalhesEventoActivity"
+            android:exported="false"
+            android:theme="@style/Theme.EventosIbirama.NoActionBar" />
+
+
+        <activity
+            android:name=".view.activity.CadastroEventoActivity"
+            android:exported="false"
+            android:theme="@style/Theme.EventosIbirama.NoActionBar" />
+
+
+        <activity
+            android:name=".view.activity.EditarPerfilActivity"
+            android:exported="false"
+            android:theme="@style/Theme.EventosIbirama.NoActionBar" />
+
+
+        <activity
+            android:name=".view.activity.EventosProximosActivity"
             android:exported="false"
             android:theme="@style/Theme.EventosIbirama.NoActionBar" />
 

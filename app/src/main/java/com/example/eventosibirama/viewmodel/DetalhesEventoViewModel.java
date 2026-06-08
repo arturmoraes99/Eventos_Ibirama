@@ -10,23 +10,23 @@ import com.example.eventosibirama.repository.EventoRepository;
 import com.example.eventosibirama.repository.FavoritoRepository;
 import com.example.eventosibirama.util.SingleLiveEvent;
 
-
 public class DetalhesEventoViewModel extends ViewModel {
 
     private final EventoRepository   eventoRepository;
     private final FavoritoRepository favoritoRepository;
 
-    private final MediatorLiveData<Evento>  _evento   = new MediatorLiveData<>();
-    private final MediatorLiveData<Boolean> _favorito = new MediatorLiveData<>();
+    private final MediatorLiveData<Evento>  _evento    = new MediatorLiveData<>();
+    private final MediatorLiveData<Boolean> _favorito  = new MediatorLiveData<>();
     private final MutableLiveData<Boolean>  _isLoading = new MutableLiveData<>(false);
+    private final SingleLiveEvent<String>   _mensagem  = new SingleLiveEvent<>();
 
-    /** SingleLiveEvent garante que o toast só aparece uma vez por evento. */
-    private final SingleLiveEvent<String> _mensagem = new SingleLiveEvent<>();
+    // NOVO: sinaliza que o evento foi excluído → Activity faz finish()
+    private final SingleLiveEvent<Boolean>  _excluido  = new SingleLiveEvent<>();
 
-    // Fontes atuais (para poder trocar sem leak)
     private LiveData<Evento>  eventoSource;
     private LiveData<Boolean> favoritoSource;
     private LiveData<Boolean> toggleSource;
+    private LiveData<Boolean> excluirSource;
 
     public DetalhesEventoViewModel() {
         eventoRepository   = new EventoRepository();
@@ -37,6 +37,7 @@ public class DetalhesEventoViewModel extends ViewModel {
     public LiveData<Boolean> isFavorito()   { return _favorito;  }
     public LiveData<Boolean> getIsLoading() { return _isLoading; }
     public LiveData<String>  getMensagem()  { return _mensagem;  }
+    public LiveData<Boolean> getExcluido()  { return _excluido;  }
 
     public void carregarEvento(String eventoId) {
         _isLoading.setValue(true);
@@ -60,13 +61,12 @@ public class DetalhesEventoViewModel extends ViewModel {
         if (toggleSource != null) _favorito.removeSource(toggleSource);
         toggleSource = favoritoRepository.adicionarFavorito(eventoId);
         _favorito.addSource(toggleSource, sucesso -> {
-            if (sucesso != null) {
-                if (sucesso) {
-                    _favorito.setValue(true);
-                    _mensagem.setValue("Evento adicionado aos favoritos!");
-                } else {
-                    _mensagem.setValue("Erro ao favoritar evento.");
-                }
+            if (sucesso == null) return;
+            if (sucesso) {
+                _favorito.setValue(true);
+                _mensagem.setValue("Evento adicionado aos favoritos!");
+            } else {
+                _mensagem.setValue("Erro ao favoritar evento.");
             }
         });
     }
@@ -75,14 +75,31 @@ public class DetalhesEventoViewModel extends ViewModel {
         if (toggleSource != null) _favorito.removeSource(toggleSource);
         toggleSource = favoritoRepository.removerFavorito(eventoId);
         _favorito.addSource(toggleSource, sucesso -> {
-            if (sucesso != null) {
-                if (sucesso) {
-                    _favorito.setValue(false);
-                    _mensagem.setValue("Evento removido dos favoritos.");
-                } else {
-                    _mensagem.setValue("Erro ao remover favorito.");
-                }
+            if (sucesso == null) return;
+            if (sucesso) {
+                _favorito.setValue(false);
+                _mensagem.setValue("Evento removido dos favoritos.");
+            } else {
+                _mensagem.setValue("Erro ao remover favorito.");
             }
         });
+    }
+
+    public void excluirEvento(String eventoId) {
+        _isLoading.setValue(true);
+        if (excluirSource != null) _excluido.removeObserver(ok -> {});
+        excluirSource = eventoRepository.excluirEvento(eventoId);
+
+        MediatorLiveData<Void> mediator = new MediatorLiveData<>();
+        mediator.addSource(excluirSource, ok -> {
+            _isLoading.setValue(false);
+            if (Boolean.TRUE.equals(ok)) {
+                _excluido.setValue(true);
+            } else {
+                _mensagem.setValue("Erro ao excluir evento.");
+            }
+            mediator.removeSource(excluirSource);
+        });
+        mediator.observeForever(v -> {});
     }
 }

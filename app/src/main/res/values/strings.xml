@@ -13,6 +13,12 @@
     <string name="nao_tem_conta">Não tem conta? Cadastre-se</string>
     <string name="esqueceu_senha">Esqueceu a senha?</string>
 
+    <!-- NOVO: Recuperação de senha -->
+    <string name="recuperar_senha_instrucao">Informe seu e-mail e enviaremos um link para redefinir sua senha.</string>
+    <string name="enviar_email_recuperacao">Enviar link de recuperação</string>
+    <string name="voltar_login">Voltar para o login</string>
+    <string name="email_recuperacao_enviado">E-mail enviado! Verifique sua caixa de entrada.</string>
+
     <!-- Navigation -->
     <string name="nav_home">Início</string>
     <string name="nav_favoritos">Favoritos</string>
@@ -28,9 +34,7 @@
     <string name="ver_no_mapa">Ver no Mapa</string>
     <string name="buscar_eventos">Buscar eventos…</string>
     <string name="nenhum_evento">Nenhum evento encontrado</string>
-    <!-- NOVO: mensagem quando a categoria selecionada não tem eventos -->
     <string name="nenhum_evento_categoria">Nenhum evento nesta categoria</string>
-    <!-- NOVO: botão para limpar o filtro ativo no estado vazio -->
     <string name="ver_todos_eventos">Ver todos os eventos</string>
     <string name="nenhum_favorito">Você ainda não tem favoritos</string>
     <string name="data_hora">Data e Hora</string>
@@ -39,14 +43,50 @@
     <string name="descricao">Descrição</string>
     <string name="mapa_titulo">Mapa de Eventos</string>
 
-    <!-- Perfil -->
+    <!-- NOVO: Cadastro de evento -->
+    <string name="cadastrar_evento">Cadastrar Evento</string>
+    <string name="editar_evento">Editar Evento</string>
+    <string name="excluir_evento">Excluir Evento</string>
+    <string name="salvar_evento">Salvar Evento</string>
+    <string name="evento_cadastrado">Evento cadastrado com sucesso!</string>
+    <string name="evento_atualizado">Evento atualizado com sucesso!</string>
+    <string name="evento_excluido">Evento excluído com sucesso.</string>
+    <string name="confirmar_exclusao">Tem certeza que deseja excluir este evento? Esta ação não pode ser desfeita.</string>
+    <string name="excluir">Excluir</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="nome_evento">Nome do evento</string>
+    <string name="data_hint">Data (ex: 29/06/2026)</string>
+    <string name="hora_hint">Hora (ex: 21h00)</string>
+    <string name="categoria_id_hint">ID da categoria</string>
+    <string name="imagem_url_hint">URL da imagem (opcional)</string>
+    <string name="latitude_hint">Latitude</string>
+    <string name="longitude_hint">Longitude</string>
+    <string name="erro_campo_obrigatorio">Campo obrigatório</string>
+    <string name="erro_coordenada_invalida">Coordenada inválida</string>
+
+    <!-- NOVO: Perfil -->
+    <string name="editar_perfil">Editar Perfil</string>
+    <string name="perfil_atualizado">Perfil atualizado com sucesso!</string>
+    <string name="salvar_perfil">Salvar Perfil</string>
+    <string name="foto_url_hint">URL da foto de perfil (opcional)</string>
+    <string name="preview_foto">Preview — preencha a URL e toque fora do campo</string>
+
+    <!-- NOVO: Eventos Próximos -->
+    <string name="eventos_proximos">Eventos Próximos</string>
+    <string name="buscando_localizacao">Buscando sua localização…</string>
+    <string name="buscando_em_raio">Eventos em até %d km de você</string>
+    <string name="nenhum_evento_proximo">Nenhum evento encontrado próximo a você</string>
+    <string name="erro_localizacao">Não foi possível obter sua localização. Tente novamente.</string>
+    <string name="permissao_localizacao_negada">Permissão de localização negada. Habilite nas configurações do app.</string>
+
+    <!-- Perfil existente -->
     <string name="perfil">Perfil</string>
     <string name="sair">Sair</string>
     <string name="usuario">Usuário</string>
     <string name="minha_conta">Minha Conta</string>
     <string name="eventos_favoritos_label">Eventos Favoritos</string>
 
-    <!-- Feedback de ações -->
+    <!-- Feedback -->
     <string name="evento_adicionado_favoritos">Evento adicionado aos favoritos!</string>
     <string name="evento_removido_favoritos">Evento removido dos favoritos.</string>
     <string name="erro_favoritar">Erro ao favoritar evento.</string>
@@ -55,7 +95,7 @@
     <string name="erro_carregar_favoritos">Erro ao carregar favoritos.</string>
     <string name="maps_nao_encontrado">Google Maps não encontrado</string>
 
-    <!-- Erros de validação -->
+    <!-- Validação -->
     <string name="erro_campos_vazios">Preencha todos os campos</string>
     <string name="erro_senhas_diferentes">As senhas não coincidem</string>
     <string name="erro_email_invalido">E-mail inválido</string>

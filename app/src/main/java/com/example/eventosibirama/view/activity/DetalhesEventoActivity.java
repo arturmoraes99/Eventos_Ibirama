@@ -9,6 +9,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
@@ -18,17 +19,18 @@ import com.example.eventosibirama.R;
 import com.example.eventosibirama.model.Evento;
 import com.example.eventosibirama.viewmodel.DetalhesEventoViewModel;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class DetalhesEventoActivity extends AppCompatActivity {
 
     private ImageView      ivImagem;
     private TextView       tvNome, tvData, tvHora, tvLocal, tvDescricao;
-    private MaterialButton btnVerMapa, fabFavorito;
+    private MaterialButton btnVerMapa, fabFavorito, btnEditar, btnExcluir;
     private ProgressBar    progressBar;
 
     private DetalhesEventoViewModel viewModel;
-    private String                  eventoId;
-    private boolean                 isFavorito = false;
+    private String eventoId;
+    private boolean isFavorito = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,40 +62,47 @@ public class DetalhesEventoActivity extends AppCompatActivity {
         tvDescricao = findViewById(R.id.tv_descricao_evento);
         btnVerMapa  = findViewById(R.id.btn_ver_mapa);
         fabFavorito = findViewById(R.id.fab_favorito);
+        btnEditar   = findViewById(R.id.btn_editar);
+        btnExcluir  = findViewById(R.id.btn_excluir);
         progressBar = findViewById(R.id.progress_bar);
+
+        // Botões de edição ficam ocultos até confirmar que o usuário é o criador
+        btnEditar.setVisibility(View.GONE);
+        btnExcluir.setVisibility(View.GONE);
     }
 
     private void observarViewModel() {
-        // Loading
         viewModel.getIsLoading().observe(this, isLoading -> {
-            if (isLoading != null) {
+            if (isLoading != null)
                 progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
-            }
         });
 
-        // Dados do evento
         viewModel.getEvento().observe(this, evento -> {
             if (evento != null) preencherDados(evento);
         });
 
-        // Estado do favorito
         viewModel.isFavorito().observe(this, favorito -> {
             isFavorito = Boolean.TRUE.equals(favorito);
-            // CORRIGIDO: textos usam @string em vez de strings hardcoded
             fabFavorito.setIconResource(
                     isFavorito ? R.drawable.ic_favorite : R.drawable.ic_favorite_border);
-            fabFavorito.setText(
-                    isFavorito ? R.string.favoritado : R.string.favoritar);
+            fabFavorito.setText(isFavorito ? R.string.favoritado : R.string.favoritar);
             fabFavorito.setTextColor(getColor(
                     isFavorito ? R.color.favorite_active : R.color.primary));
             fabFavorito.setIconTint(getColorStateList(
                     isFavorito ? R.color.favorite_active : R.color.primary));
         });
 
-        // Mensagens de feedback (SingleLiveEvent — aparecem apenas uma vez)
-        viewModel.getMensagem().observe(this, mensagem -> {
-            if (mensagem != null)
-                Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show();
+        viewModel.getMensagem().observe(this, msg -> {
+            if (msg != null) Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        });
+
+        // NOVO: observa resultado da exclusão
+        viewModel.getExcluido().observe(this, excluido -> {
+            if (Boolean.TRUE.equals(excluido)) {
+                Toast.makeText(this,
+                        getString(R.string.evento_excluido), Toast.LENGTH_SHORT).show();
+                finish();
+            }
         });
     }
 
@@ -113,12 +122,36 @@ public class DetalhesEventoActivity extends AppCompatActivity {
         btnVerMapa.setOnClickListener(v -> abrirMapa(evento));
 
         fabFavorito.setOnClickListener(v -> {
-            if (isFavorito) {
-                viewModel.removerFavorito(eventoId);
-            } else {
-                viewModel.adicionarFavorito(eventoId);
-            }
+            if (isFavorito) viewModel.removerFavorito(eventoId);
+            else            viewModel.adicionarFavorito(eventoId);
         });
+
+        // NOVO: exibe botões de editar/excluir apenas para o criador
+        String uidAtual = FirebaseAuth.getInstance().getCurrentUser() != null
+                ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
+
+        if (evento.foiCriadoPor(uidAtual)) {
+            btnEditar.setVisibility(View.VISIBLE);
+            btnExcluir.setVisibility(View.VISIBLE);
+
+            btnEditar.setOnClickListener(v -> {
+                Intent intent = new Intent(this, CadastroEventoActivity.class);
+                intent.putExtra(CadastroEventoActivity.EXTRA_EVENTO_ID, eventoId);
+                startActivity(intent);
+            });
+
+            btnExcluir.setOnClickListener(v -> confirmarExclusao());
+        }
+    }
+
+    private void confirmarExclusao() {
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.excluir_evento))
+                .setMessage(getString(R.string.confirmar_exclusao))
+                .setPositiveButton(getString(R.string.excluir), (dialog, which) ->
+                        viewModel.excluirEvento(eventoId))
+                .setNegativeButton(getString(R.string.cancelar), null)
+                .show();
     }
 
     private void abrirMapa(Evento evento) {

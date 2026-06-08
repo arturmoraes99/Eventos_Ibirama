@@ -18,7 +18,6 @@
         app:navigationIconTint="@color/on_primary"
         app:titleTextColor="@color/on_primary" />
 
-    <!-- ADICIONADO: ProgressBar de loading -->
     <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"
@@ -54,7 +53,6 @@
                     android:id="@+id/tv_nome_evento"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/detalhes"
                     android:textColor="@color/on_surface"
                     android:textSize="22sp"
                     android:textStyle="bold" />
@@ -71,34 +69,21 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
-
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:src="@drawable/ic_calendar"
                         android:tint="@color/primary" />
-
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/data_hora"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:id="@+id/tv_data_evento"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="--/--/----"
-                            android:textColor="@color/on_surface"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="@string/data_hora" android:textColor="@color/text_secondary" android:textSize="12sp" />
+                        <TextView android:id="@+id/tv_data_evento" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:textColor="@color/on_surface"
+                            android:textSize="15sp" android:textStyle="bold" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -109,34 +94,21 @@
                     android:layout_marginTop="10dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
-
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:src="@drawable/ic_event"
                         android:tint="@color/primary" />
-
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/horario"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:id="@+id/tv_hora_evento"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="--h--"
-                            android:textColor="@color/on_surface"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="@string/horario" android:textColor="@color/text_secondary" android:textSize="12sp" />
+                        <TextView android:id="@+id/tv_hora_evento" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:textColor="@color/on_surface"
+                            android:textSize="15sp" android:textStyle="bold" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -147,34 +119,21 @@
                     android:layout_marginTop="10dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
-
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:src="@drawable/ic_location"
                         android:tint="@color/primary" />
-
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/local"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:id="@+id/tv_local_evento"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="--"
-                            android:textColor="@color/on_surface"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="@string/local" android:textColor="@color/text_secondary" android:textSize="12sp" />
+                        <TextView android:id="@+id/tv_local_evento" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:textColor="@color/on_surface"
+                            android:textSize="15sp" android:textStyle="bold" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -184,13 +143,9 @@
                     android:layout_marginTop="12dp"
                     android:layout_marginBottom="12dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/descricao"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/descricao" android:textColor="@color/text_secondary"
+                    android:textSize="13sp" android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tv_descricao_evento"
@@ -198,7 +153,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:lineSpacingExtra="4dp"
-                    android:text="--"
                     android:textColor="@color/on_surface"
                     android:textSize="15sp" />
 
@@ -218,12 +172,39 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:layout_marginBottom="16dp"
                     android:text="@string/favoritar"
                     android:textColor="@color/primary"
                     app:icon="@drawable/ic_favorite_border"
                     app:iconTint="@color/primary"
                     app:strokeColor="@color/primary" />
+
+                <!-- NOVO: botões visíveis apenas para o criador do evento -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_editar"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/editar_evento"
+                    android:textColor="@color/primary"
+                    app:icon="@drawable/ic_event"
+                    app:iconTint="@color/primary"
+                    app:strokeColor="@color/primary"
+                    android:visibility="gone" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_excluir"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="16dp"
+                    android:text="@string/excluir_evento"
+                    android:textColor="@color/error"
+                    app:icon="@drawable/ic_logout"
+                    app:iconTint="@color/error"
+                    app:strokeColor="@color/error"
+                    android:visibility="gone" />
 
             </LinearLayout>
         </LinearLayout>

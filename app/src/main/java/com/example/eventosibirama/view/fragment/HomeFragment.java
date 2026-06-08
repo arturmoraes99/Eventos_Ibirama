@@ -23,9 +23,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.eventosibirama.R;
 import com.example.eventosibirama.adapter.CategoriaAdapter;
 import com.example.eventosibirama.adapter.EventoAdapter;
+import com.example.eventosibirama.view.activity.CadastroEventoActivity;
 import com.example.eventosibirama.view.activity.DetalhesEventoActivity;
+import com.example.eventosibirama.view.activity.EventosProximosActivity;
 import com.example.eventosibirama.viewmodel.EventoViewModel;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 
 public class HomeFragment extends Fragment {
@@ -36,6 +39,8 @@ public class HomeFragment extends Fragment {
     private LinearLayout      layoutVazioEventos;
     private TextView          tvVazioEventos;
     private MaterialButton    btnLimparFiltro;
+    private FloatingActionButton fabCadastrar;
+    private MaterialButton    btnEventosProximos;
 
     private CategoriaAdapter categoriaAdapter;
     private EventoAdapter    eventoAdapter;
@@ -64,6 +69,8 @@ public class HomeFragment extends Fragment {
         layoutVazioEventos = view.findViewById(R.id.layout_vazio_eventos);
         tvVazioEventos     = view.findViewById(R.id.tv_vazio_eventos);
         btnLimparFiltro    = view.findViewById(R.id.btn_limpar_filtro);
+        fabCadastrar       = view.findViewById(R.id.fab_cadastrar_evento);
+        btnEventosProximos = view.findViewById(R.id.btn_eventos_proximos);
 
         configurarRecyclerCategorias();
         configurarRecyclerEventos();
@@ -71,6 +78,13 @@ public class HomeFragment extends Fragment {
         configurarBusca();
 
         btnLimparFiltro.setOnClickListener(v -> resetar());
+
+
+        fabCadastrar.setOnClickListener(v ->
+                startActivity(new Intent(getActivity(), CadastroEventoActivity.class)));
+
+        btnEventosProximos.setOnClickListener(v ->
+                startActivity(new Intent(getActivity(), EventosProximosActivity.class)));
 
         carregarDadosIniciais();
     }
@@ -87,16 +101,13 @@ public class HomeFragment extends Fragment {
         categoriaAdapter = new CategoriaAdapter(categoria -> {
             filtroAtivo = true;
             categoriaAdapter.setSelectedId(categoria.getId());
-
             if (etBusca != null && buscaWatcher != null) {
                 etBusca.removeTextChangedListener(buscaWatcher);
                 etBusca.setText("");
                 etBusca.addTextChangedListener(buscaWatcher);
             }
-
             eventoViewModel.buscarEventosPorCategoria(categoria.getId());
         });
-
         rvCategorias.setLayoutManager(new GridLayoutManager(getContext(), 2));
         rvCategorias.setAdapter(categoriaAdapter);
     }
@@ -107,7 +118,6 @@ public class HomeFragment extends Fragment {
             intent.putExtra("evento_id", evento.getId());
             startActivity(intent);
         });
-
         rvEventos.setLayoutManager(new LinearLayoutManager(getContext()));
         rvEventos.setAdapter(eventoAdapter);
     }
@@ -143,7 +153,6 @@ public class HomeFragment extends Fragment {
         if (vazio) {
             rvEventos.setVisibility(View.GONE);
             layoutVazioEventos.setVisibility(View.VISIBLE);
-
             if (filtroAtivo) {
                 tvVazioEventos.setText(R.string.nenhum_evento_categoria);
                 btnLimparFiltro.setVisibility(View.VISIBLE);
@@ -157,13 +166,12 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    // ── Busca por texto ───────────────────────────────────────────────────────
+    // ── Busca ─────────────────────────────────────────────────────────────────
 
     private void configurarBusca() {
         buscaWatcher = new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void afterTextChanged(Editable s) {}
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String query = s.toString().trim();
@@ -185,17 +193,12 @@ public class HomeFragment extends Fragment {
 
     public void resetar() {
         filtroAtivo = false;
-
         if (etBusca != null && buscaWatcher != null) {
             etBusca.removeTextChangedListener(buscaWatcher);
             etBusca.setText("");
             etBusca.addTextChangedListener(buscaWatcher);
         }
-
-        if (categoriaAdapter != null) {
-            categoriaAdapter.setSelectedId(null);
-        }
-
+        if (categoriaAdapter != null) categoriaAdapter.setSelectedId(null);
         carregarDadosIniciais();
     }
 

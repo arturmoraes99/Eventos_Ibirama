@@ -11,7 +11,6 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
         <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -20,7 +19,6 @@
             app:titleTextColor="@color/on_primary" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- ADICIONADO: ProgressBar de loading -->
     <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"
@@ -64,9 +62,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="email@exemplo.com"
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp" />
+
+            <!-- NOVO: botão Editar Perfil -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_editar_perfil"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/editar_perfil"
+                android:textColor="@color/primary"
+                app:strokeColor="@color/primary" />
 
             <com.google.android.material.divider.MaterialDivider
                 android:layout_width="match_parent"
