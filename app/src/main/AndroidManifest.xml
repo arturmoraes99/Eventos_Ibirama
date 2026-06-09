@@ -30,6 +30,11 @@
         </activity>
 
         <activity
+            android:name=".view.activity.CadastroCategoriaActivity"
+            android:exported="false"
+            android:theme="@style/Theme.EventosIbirama.NoActionBar" />
+
+        <activity
             android:name=".view.activity.AuthActivity"
             android:exported="false"
             android:theme="@style/Theme.EventosIbirama.NoActionBar" />

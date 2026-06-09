@@ -59,6 +59,7 @@
             app:iconTint="@color/primary"
             app:strokeColor="@color/primary" />
 
+
         <!-- ProgressBar -->
         <ProgressBar
             android:id="@+id/progress_bar"
@@ -132,7 +133,7 @@
                         android:layout_height="64dp"
                         android:alpha="0.5"
                         android:src="@drawable/ic_evento_placeholder"
-                        android:tint="@color/text_secondary" />
+                        app:tint="@color/text_secondary" />
 
                     <TextView
                         android:id="@+id/tv_vazio_eventos"

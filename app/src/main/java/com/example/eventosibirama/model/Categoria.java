@@ -5,18 +5,18 @@ public class Categoria {
     private String id;
     private String nome;
     private String iconeUrl;
-    private int iconeResId; // para ícones locais
+    private String iconeResId;
 
     // Construtor vazio obrigatório para o Firestore
     public Categoria() {}
 
-    public Categoria(String id, String nome, int iconeResId) {
+    public Categoria(String id, String nome, String iconeResId) {
         this.id         = id;
         this.nome       = nome;
         this.iconeResId = iconeResId;
     }
 
-    public Categoria(String id, String nome, String iconeUrl) {
+    public Categoria(String id, String nome, String iconeUrl, boolean isUrl) {
         this.id       = id;
         this.nome     = nome;
         this.iconeUrl = iconeUrl;
@@ -32,6 +32,6 @@ public class Categoria {
     public String getIconeUrl() { return iconeUrl; }
     public void setIconeUrl(String iconeUrl) { this.iconeUrl = iconeUrl; }
 
-    public int getIconeResId() { return iconeResId; }
-    public void setIconeResId(int iconeResId) { this.iconeResId = iconeResId; }
+    public String getIconeResId() { return iconeResId; }
+    public void setIconeResId(String iconeResId) { this.iconeResId = iconeResId; }
 }

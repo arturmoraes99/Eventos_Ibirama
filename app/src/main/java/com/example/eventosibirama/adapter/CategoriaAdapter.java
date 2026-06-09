@@ -1,5 +1,6 @@
 package com.example.eventosibirama.adapter;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,13 +98,19 @@ public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.Cate
         public void bind(Categoria categoria) {
             tvNome.setText(categoria.getNome());
 
+            // Tenta carregar por URL primeiro
             if (categoria.getIconeUrl() != null && !categoria.getIconeUrl().isEmpty()) {
                 Glide.with(itemView.getContext())
                         .load(categoria.getIconeUrl())
                         .placeholder(R.drawable.ic_categoria_placeholder)
                         .into(ivIcone);
-            } else if (categoria.getIconeResId() != 0) {
-                ivIcone.setImageResource(categoria.getIconeResId());
+
+                // Senão tenta pelo nome do ícone salvo no Firestore
+            } else if (categoria.getIconeResId() != null && !categoria.getIconeResId().isEmpty())  {
+                int resId = getIconePorNome(itemView.getContext(), categoria.getIconeResId());
+                ivIcone.setImageResource(resId);
+
+                // Fallback
             } else {
                 ivIcone.setImageResource(R.drawable.ic_categoria_placeholder);
             }
@@ -131,6 +138,12 @@ public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.Cate
             }
         }
     }
+
+        private int getIconePorNome(Context context, String nome) {
+            int resId = context.getResources().getIdentifier(
+                    nome, "drawable", context.getPackageName());
+            return resId != 0 ? resId : R.drawable.ic_categoria_placeholder;
+        }
 
     // ── DiffCallback ──────────────────────────────────────────────────────────
 

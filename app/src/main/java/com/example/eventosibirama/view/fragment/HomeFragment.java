@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.eventosibirama.R;
 import com.example.eventosibirama.adapter.CategoriaAdapter;
 import com.example.eventosibirama.adapter.EventoAdapter;
+import com.example.eventosibirama.view.activity.CadastroCategoriaActivity;
 import com.example.eventosibirama.view.activity.CadastroEventoActivity;
 import com.example.eventosibirama.view.activity.DetalhesEventoActivity;
 import com.example.eventosibirama.view.activity.EventosProximosActivity;
@@ -47,6 +48,7 @@ public class HomeFragment extends Fragment {
     private EventoViewModel  eventoViewModel;
     private TextWatcher      buscaWatcher;
     private boolean          filtroAtivo = false;
+
 
     @Nullable
     @Override
@@ -85,6 +87,7 @@ public class HomeFragment extends Fragment {
 
         btnEventosProximos.setOnClickListener(v ->
                 startActivity(new Intent(getActivity(), EventosProximosActivity.class)));
+
 
         carregarDadosIniciais();
     }

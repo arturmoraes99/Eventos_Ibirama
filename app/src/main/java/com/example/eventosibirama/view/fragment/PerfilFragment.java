@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.bumptech.glide.Glide;
 import com.example.eventosibirama.R;
 import com.example.eventosibirama.view.activity.AuthActivity;
+import com.example.eventosibirama.view.activity.CadastroCategoriaActivity;
 import com.example.eventosibirama.view.activity.EditarPerfilActivity;
 import com.example.eventosibirama.viewmodel.FavoritosViewModel;
 import com.example.eventosibirama.viewmodel.PerfilViewModel;
@@ -55,14 +56,18 @@ public class PerfilFragment extends Fragment {
         btnLogout      = view.findViewById(R.id.btn_logout);
         btnEditarPerfil = view.findViewById(R.id.btn_editar_perfil);
         progressBar    = view.findViewById(R.id.progress_bar);
+        MaterialButton btnCadastrarCategoria = view.findViewById(R.id.btn_cadastrar_categoria);
 
-        observarViewModel();
 
         // NOVO: abre EditarPerfilActivity
         btnEditarPerfil.setOnClickListener(v ->
                 startActivity(new Intent(getActivity(), EditarPerfilActivity.class)));
 
         btnLogout.setOnClickListener(v -> realizarLogout());
+
+        btnCadastrarCategoria.setOnClickListener(v ->
+                startActivity(new Intent(getActivity(), CadastroCategoriaActivity.class)));
+        observarViewModel();
 
         perfilViewModel.carregarPerfil();
         favoritosViewModel.carregarFavoritos();
