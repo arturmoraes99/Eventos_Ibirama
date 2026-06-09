@@ -52,8 +52,7 @@
                 <ImageView
                     android:layout_width="14dp"
                     android:layout_height="14dp"
-                    android:src="@drawable/ic_calendar"
-                    android:tint="@color/text_secondary" />
+                    android:src="@drawable/ic_calendar"/>
 
                 <TextView
                     android:id="@+id/tv_data_evento"
@@ -86,8 +85,7 @@
                 <ImageView
                     android:layout_width="14dp"
                     android:layout_height="14dp"
-                    android:src="@drawable/ic_location"
-                    android:tint="@color/text_secondary" />
+                    android:src="@drawable/ic_location"/>
 
                 <TextView
                     android:id="@+id/tv_local_evento"
@@ -96,9 +94,9 @@
                     android:layout_marginStart="4dp"
                     android:layout_weight="1"
                     android:ellipsize="end"
-                    android:maxLines="1"
+                    android:textColor="@color/on_surface"
+        android:maxLines="1"
                     android:text="Local"
-                    android:textColor="@color/text_secondary"
                     android:textSize="12sp" />
             </LinearLayout>
 

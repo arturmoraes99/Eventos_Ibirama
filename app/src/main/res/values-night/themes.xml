@@ -10,5 +10,6 @@
         <item name="colorError">@color/error</item>
         <item name="android:statusBarColor">@color/surface</item>
         <item name="android:navigationBarColor">@color/surface</item>
+        <item name="android:textColor">@color/on_surface</item>
     </style>
 </resources>

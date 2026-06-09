@@ -11,6 +11,7 @@
         <item name="colorError">@color/error</item>
         <item name="android:statusBarColor">@color/surface</item>
         <item name="android:navigationBarColor">@color/surface</item>
+        <item name="android:textColor">@color/on_surface</item>
     </style>
 
     <style name="Theme.EventosIbirama.NoActionBar" parent="Theme.EventosIbirama" />
@@ -42,6 +43,11 @@
         <item name="hintTextColor">@color/primary</item>
         <item name="android:textColorHint">@color/text_secondary</item>
         <item name="boxBackgroundColor">@color/surface</item>
+    </style>
+
+    <!-- Estilo do texto dentro do campo -->
+    <style name="InputEditTextStyle" parent="Widget.MaterialComponents.TextInputEditText.OutlinedBox">
+        <item name="android:textColor">@color/on_surface</item>
     </style>
 
 </resources>
