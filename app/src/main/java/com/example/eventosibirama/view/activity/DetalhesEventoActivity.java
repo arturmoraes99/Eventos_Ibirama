@@ -156,9 +156,10 @@ public class DetalhesEventoActivity extends AppCompatActivity {
 
     private void abrirMapa(Evento evento) {
         String uri = "geo:" + evento.getLatitude() + "," + evento.getLongitude()
-                + "?q=" + Uri.encode(evento.getLocal());
+                + "?q=" + evento.getLatitude() + "," + evento.getLongitude()
+                + "(" + Uri.encode(evento.getNome()) + ")";
+
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-        intent.setPackage("com.google.android.apps.maps");
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivity(intent);
         } else {

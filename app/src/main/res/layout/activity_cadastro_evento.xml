@@ -121,17 +121,20 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilCategoria"
-                style="@style/InputStyle"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:hint="@string/categoria_id_hint">
-                <com.google.android.material.textfield.TextInputEditText
+                android:layout_marginTop="8dp"
+                android:hint="Categoria">
+
+                <AutoCompleteTextView
                     android:id="@+id/et_categoria"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/on_surface"
-                    android:maxLines="1" />
+                    android:focusable="false"
+                    android:inputType="none"
+                    android:paddingStart="12dp"/>
+
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout

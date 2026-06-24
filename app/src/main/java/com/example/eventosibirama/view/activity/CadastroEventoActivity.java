@@ -3,6 +3,8 @@ package com.example.eventosibirama.view.activity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -11,27 +13,35 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.eventosibirama.R;
+import com.example.eventosibirama.model.Categoria;
 import com.example.eventosibirama.model.Evento;
+import com.example.eventosibirama.repository.CategoriaRepository;
 import com.example.eventosibirama.viewmodel.CadastroEventoViewModel;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.util.ArrayList;
+import java.util.List;
 
 public class CadastroEventoActivity extends AppCompatActivity {
 
     public static final String EXTRA_EVENTO_ID = "evento_id";
 
-    private TextInputLayout   tilNome, tilDescricao, tilData, tilHora,
+    private TextInputLayout    tilNome, tilDescricao, tilData, tilHora,
             tilLocal, tilImagem, tilLat, tilLng, tilCategoria;
-    private TextInputEditText etNome, etDescricao, etData, etHora,
-            etLocal, etImagem, etLat, etLng, etCategoria;
-    private MaterialButton    btnSalvar;
-    private ProgressBar       progressBar;
+    private TextInputEditText  etNome, etDescricao, etData, etHora,
+            etLocal, etImagem, etLat, etLng;
+    private AutoCompleteTextView spinnerCategoria;
+    private MaterialButton     btnSalvar;
+    private ProgressBar        progressBar;
 
     private CadastroEventoViewModel viewModel;
-    private String eventoId = null; // null = modo criar
+    private String eventoId = null;
     private Evento eventoEditando = null;
+
+    private List<Categoria> listaCategorias = new ArrayList<>();
+    private String categoriaSelecionadaId = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,9 +54,9 @@ public class CadastroEventoActivity extends AppCompatActivity {
         configurarToolbar();
         inicializarViews();
         observarViewModel();
+        carregarCategorias();
 
         if (eventoId != null) {
-            // Modo edição: carrega dados existentes
             viewModel.carregarEvento(eventoId);
         }
 
@@ -76,18 +86,49 @@ public class CadastroEventoActivity extends AppCompatActivity {
         tilLng       = findViewById(R.id.tilLng);
         tilCategoria = findViewById(R.id.tilCategoria);
 
-        etNome      = findViewById(R.id.et_nome);
-        etDescricao = findViewById(R.id.et_descricao);
-        etData      = findViewById(R.id.et_data);
-        etHora      = findViewById(R.id.et_hora);
-        etLocal     = findViewById(R.id.et_local);
-        etImagem    = findViewById(R.id.et_imagem);
-        etLat       = findViewById(R.id.et_lat);
-        etLng       = findViewById(R.id.et_lng);
-        etCategoria = findViewById(R.id.et_categoria);
+        etNome       = findViewById(R.id.et_nome);
+        etDescricao  = findViewById(R.id.et_descricao);
+        etData       = findViewById(R.id.et_data);
+        etHora       = findViewById(R.id.et_hora);
+        etLocal      = findViewById(R.id.et_local);
+        etImagem     = findViewById(R.id.et_imagem);
+        etLat        = findViewById(R.id.et_lat);
+        etLng        = findViewById(R.id.et_lng);
+        spinnerCategoria = findViewById(R.id.et_categoria);
 
-        btnSalvar   = findViewById(R.id.btn_salvar);
-        progressBar = findViewById(R.id.progress_bar);
+        btnSalvar    = findViewById(R.id.btn_salvar);
+        progressBar  = findViewById(R.id.progress_bar);
+    }
+
+    private void carregarCategorias() {
+        CategoriaRepository repo = new CategoriaRepository();
+        repo.getCategorias().observe(this, categorias -> {
+            if (categorias == null) return;
+            listaCategorias = categorias;
+
+            List<String> nomes = new ArrayList<>();
+            for (Categoria c : categorias) nomes.add(c.getNome());
+
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                    this,
+                    android.R.layout.simple_dropdown_item_1line,
+                    nomes);
+            spinnerCategoria.setAdapter(adapter);
+
+            spinnerCategoria.setOnItemClickListener((parent, view, position, id) ->
+                    categoriaSelecionadaId = listaCategorias.get(position).getId());
+
+            // Modo edição: marca a categoria atual pelo nome
+            if (eventoEditando != null && eventoEditando.getCategoriaId() != null) {
+                for (Categoria c : categorias) {
+                    if (c.getId().equals(eventoEditando.getCategoriaId())) {
+                        spinnerCategoria.setText(c.getNome(), false);
+                        categoriaSelecionadaId = c.getId();
+                        break;
+                    }
+                }
+            }
+        });
     }
 
     private void observarViewModel() {
@@ -112,7 +153,6 @@ public class CadastroEventoActivity extends AppCompatActivity {
             }
         });
 
-        // Modo edição: preenche campos com dados do evento
         viewModel.getEvento().observe(this, evento -> {
             if (evento != null) {
                 eventoEditando = evento;
@@ -130,27 +170,25 @@ public class CadastroEventoActivity extends AppCompatActivity {
         etImagem.setText(e.getImagemUrl());
         etLat.setText(String.valueOf(e.getLatitude()));
         etLng.setText(String.valueOf(e.getLongitude()));
-        etCategoria.setText(e.getCategoriaId());
+        // categoria preenchida em carregarCategorias() após lista carregar
     }
 
     private void salvar() {
-        // Limpa erros
         tilNome.setError(null);
         tilData.setError(null);
         tilHora.setError(null);
         tilLocal.setError(null);
+        tilCategoria.setError(null);
 
-        String nome       = getText(etNome);
-        String descricao  = getText(etDescricao);
-        String data       = getText(etData);
-        String hora       = getText(etHora);
-        String local      = getText(etLocal);
-        String imagem     = getText(etImagem);
-        String latStr     = getText(etLat);
-        String lngStr     = getText(etLng);
-        String categoriaId = getText(etCategoria);
+        String nome      = getText(etNome);
+        String descricao = getText(etDescricao);
+        String data      = getText(etData);
+        String hora      = getText(etHora);
+        String local     = getText(etLocal);
+        String imagem    = getText(etImagem);
+        String latStr    = getText(etLat);
+        String lngStr    = getText(etLng);
 
-        // Validações obrigatórias
         if (TextUtils.isEmpty(nome)) {
             tilNome.setError(getString(R.string.erro_campo_obrigatorio));
             return;
@@ -167,6 +205,10 @@ public class CadastroEventoActivity extends AppCompatActivity {
             tilLocal.setError(getString(R.string.erro_campo_obrigatorio));
             return;
         }
+        if (categoriaSelecionadaId == null) {
+            tilCategoria.setError("Selecione uma categoria");
+            return;
+        }
 
         double lat = 0, lng = 0;
         try {
@@ -178,7 +220,6 @@ public class CadastroEventoActivity extends AppCompatActivity {
         }
 
         if (eventoId != null && eventoEditando != null) {
-            // Modo edição: preserva o criadoPorUid original
             eventoEditando.setNome(nome);
             eventoEditando.setDescricao(descricao);
             eventoEditando.setData(data);
@@ -187,10 +228,9 @@ public class CadastroEventoActivity extends AppCompatActivity {
             eventoEditando.setImagemUrl(imagem);
             eventoEditando.setLatitude(lat);
             eventoEditando.setLongitude(lng);
-            eventoEditando.setCategoriaId(categoriaId);
+            eventoEditando.setCategoriaId(categoriaSelecionadaId);
             viewModel.atualizarEvento(eventoEditando);
         } else {
-            // Modo criar
             Evento novo = new Evento();
             novo.setNome(nome);
             novo.setDescricao(descricao);
@@ -200,7 +240,7 @@ public class CadastroEventoActivity extends AppCompatActivity {
             novo.setImagemUrl(imagem);
             novo.setLatitude(lat);
             novo.setLongitude(lng);
-            novo.setCategoriaId(categoriaId);
+            novo.setCategoriaId(categoriaSelecionadaId);
             viewModel.salvarEvento(novo);
         }
     }
@@ -209,4 +249,3 @@ public class CadastroEventoActivity extends AppCompatActivity {
         return et.getText() != null ? et.getText().toString().trim() : "";
     }
 }
-
